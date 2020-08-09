@@ -20,10 +20,10 @@ class Users(db.Model):
     password_hash = db.Column(db.String(256), nullable = False)
     account_created = db.Column(db.DateTime, nullable = False)
     last_login = db.Column(db.DateTime, nullable = False)
-    banned = db.Column(db.Boolean, nullable = False)
-    ban_duration = db.Column(db.DateTime, nullable = False)
-    is_admin = db.Column(db.Boolean, nullable = False)
-    secret = db.Column(db.Boolean, nullable = False)
+    banned = db.Column(db.Boolean)
+    ban_duration = db.Column(db.DateTime)
+    is_admin = db.Column(db.Boolean)
+    secret = db.Column(db.Boolean)
 
     def get_id(self):
         return self.user_id

@@ -67,7 +67,8 @@ def signup_post():
         password_hash = generate_password_hash(password, method = 'sha256'),
         account_created = current_time,
         last_login = current_time,
-        is_admin = False
+        is_admin = False,
+        banned = False
     )
 
     # Database connection
