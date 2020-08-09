@@ -1,8 +1,40 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1 class="title">
-        Welcome, {{ username }}!
-        Email: {{ email }}
-    </h1>
+    <div class="ibox-content forum-container">
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Welcome, {{ username }}!</h2>
+                <p>Here's your user info</p>
+                <br>
+            </div>
+            <div class="col-md-6">
+                <p class="float-right forum-desc">
+                </p>
+            </div>
+
+            <!-- List user info -->
+            <div class="col-md-12">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Registered</th>
+                        <th scope="col">Last login</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>{{ username }}</td>
+                        <td>{{ email }}</td>
+                        <td>{{ registered }}</td>
+                        <td>{{ last_login }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}

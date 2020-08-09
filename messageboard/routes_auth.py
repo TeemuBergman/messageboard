@@ -166,5 +166,7 @@ def new_thread_post(category_id):
 def profile():
     return render_template('profile.html',
                            username = current_user.username,
-                           email = current_user.email
+                           email = current_user.email,
+                           registered = current_user.account_created,
+                           last_login = current_user.last_login
                            )
