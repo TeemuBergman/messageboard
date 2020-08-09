@@ -1,7 +1,6 @@
 # config.py
 
-from os import getenv, path
-# from dotenv import load_dotenv
+from os import getenv
 
 
 class Config:
