@@ -37,5 +37,6 @@ coding = Categories(
     category_created = datetime.now()
 )
 
-db.session.add(general, coding)
+db.session.add(general)
+db.session.add(coding)
 db.session.commit()
