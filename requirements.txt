@@ -1,0 +1,5 @@
+flask
+flask-admin
+python-dotenv
+SQLAlchemy
+Werkzeug

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="ibox-content forum-container">
+        {% if current_user.is_authenticated %}
+
+            <!-- Header for create a new thread -->
+            <div class="row">
+                <div class="col-md-6">
+                    <h2>
+                        <a href="javascript:history.back()">Create a new thread</a>
+                    </h2>
+                </div>
+                <div class="col-md-6">
+                    <p class="float-right forum-desc"></p>
+                </div>
+            </div>
+
+            <!-- Form for a new thread title and content-->
+            <form action="/{{ category_id }}/CreateThreadPost" method="POST">
+                <div class="form-group">
+                    <label for="thread_name">Thread title</label>
+                    <input type="text" class="form-control" id="thread_name" name="thread_name">
+                </div>
+                <div class="form-group">
+                    <label for="content">Message content</label>
+                    <textarea class="form-control" id="content" name="content" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+
+        {% endif %}
+    </div>
+{% endblock %}
+
+

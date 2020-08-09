@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="ibox-content forum-container">
+
+        <!-- Header for threads -->
+        <div class="row">
+            <div class="col-md-6">
+                <h2>
+                    <a href="/{{ category_id }}">{{ thread_info.thread_name }}</a>
+                </h2>
+            </div>
+            <div class="col-md-6">
+                <p class="float-right forum-desc">
+                </p>
+            </div>
+        </div>
+
+        <!-- List all messages -->
+        {% for row in messages %}
+            <div class="forum-item">
+                <div class="row">
+                    <div class="col-md-10">
+                        <small><em>{{ row.message_created }}</em></small>
+                    </div>
+                    <div class="col-md-2">
+                        <small>Posted by:</small>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-10">
+                        <p>{{ row.message_content }}</p>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div>
+                            <p>{{ row.username }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        {% if current_user.is_authenticated %}
+            <form action="/{{ category_id }}/{{ thread_info.thread_id }}/Reply" method="POST">
+                <h5>Reply to thread</h5>
+                <div class="form-group">
+                    <label for="content">Message content</label>
+                    <textarea class="form-control" id="content" name="content" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Post a reply</button>
+            </form>
+        {% endif %}
+
+    </div>
+{% endblock %}

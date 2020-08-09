@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="ibox-content forum-container">
+
+        <!-- Header for categories -->
+        <div class="row">
+            <div class="col-md-6">
+                <h2>
+                    Welcome to Message Board!
+                </h2>
+            </div>
+            <div class="col-md-6">
+                <p class="float-right forum-desc">
+                    Total threads: {{ sum_threads }} and messages: {{ sum_messages }}
+                </p>
+            </div>
+        </div>
+
+        <!-- List all categories -->
+        {% for row in categories %}
+            <div class="forum-item">
+                <div class="row">
+
+                    <div class="col-md-10">
+                        <a href="/{{ row.category_id }}" class="forum-item-title">
+                            {{ row.category_name }}
+                        </a>
+                        <div class="forum-sub-title">
+                            {{ row.category_description }}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+{% endblock %}

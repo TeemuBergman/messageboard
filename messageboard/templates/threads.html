@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="ibox-content forum-container">
+
+        <!-- Header for threads -->
+        <div class="row">
+            <div class="col-md-10">
+                <h2>
+                    <a href="/">{{ category_info.category_name }}</a>
+                </h2>
+            </div>
+            <div class="col-md-2">
+                {% if current_user.is_authenticated %}
+                    <form action="/{{ category_info.category_id }}/CreateThread">
+                        <button type="submit" class="btn btn-outline-secondary text-nowrap">Create a new thread</button>
+                    </form>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- List all threads -->
+        {% for row in threads %}
+            <div class="forum-item">
+                <div class="row">
+
+                    <div class="col-md-10">
+                        <a href="/{{ category_info.category_id }}/{{ row.thread_id }}" class="forum-item-title">
+                            {{ row.thread_name }}
+                        </a>
+                        <div class="forum-sub-title">
+                            {{ row.message_content }}
+                        </div>
+                    </div>
+
+                    <div class="col-md-1 forum-info">
+                    </div>
+
+                    <div class="col-md-1 forum-info">
+                    </div>
+
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+{% endblock %}
