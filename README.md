@@ -3,6 +3,15 @@
 
 "Message board" is also a practical work for the University of Helsinki's Department of Computer Science: Database application course ([TKT20011](https://hy-tsoha.github.io/materiaali/index)).
 
+## STATUS
+
+#### 09.08.2020
+At the moment the Message Board -application can be tested at: messageboard-tb.herokuapp.com and its current features are:
+- User can register, login and logout
+- User can create new threads
+- User can post/reply to threads
+- User can view its personal date
+
 ## FEATURES
 
 #### Application enables:
