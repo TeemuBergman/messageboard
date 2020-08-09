@@ -1,6 +1,8 @@
 gunicorn
 flask
+flask-login
 flask-admin
+flask_sqlalchemy
 python-dotenv
 SQLAlchemy
 Werkzeug
