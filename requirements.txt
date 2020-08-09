@@ -7,4 +7,3 @@ SQLAlchemy
 psycopg2
 python-dotenv
 Werkzeug
-click
