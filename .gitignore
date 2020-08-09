@@ -149,7 +149,6 @@ dmypy.json
 cython_debug/
 
 /create_database.py
-/README.md
 /temp/
 /messageboard/messages/
 /messageboard/admin/
