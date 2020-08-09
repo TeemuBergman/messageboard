@@ -3,6 +3,7 @@ flask
 flask-login
 flask-admin
 flask_sqlalchemy
-python-dotenv
 SQLAlchemy
+psycopg2
+python-dotenv
 Werkzeug
