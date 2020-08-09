@@ -5,7 +5,7 @@ from flask_login import login_required, login_user, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from .db_models import Users, Threads, Messages
 from . import db
-from tools import getTime
+from .tools import getTime
 
 auth = Blueprint('auth', __name__)
 
