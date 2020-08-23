@@ -1,7 +1,87 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <div class="ibox-content forum-container">
 
-    <p>ADMIN CONTROL PANEL</p>
+        <!-- Header for user control panel -->
+        <div class="row">
+            <div class="col-md-12">
+                <h3 class="text-break">Message board users</h3>
+            </div>
+        </div>
 
+        <!-- List all users -->
+        {% for row in users %}
+            <div class="forum-item position-relative">
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <!-- First row of user account info -->
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col" class="col-md-1">User-ID</th>
+                                <th scope="col" class="col-md-3">Email</th>
+                                <th scope="col" class="col-md-3">Username</th>
+                                <th scope="col" class="col-md-2">Registered</th>
+                                <th scope="col" class="col-md-2">Last login</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="text-center"><p>{{ row.user_id }}</p></td>
+                                <td><p>{{ row.email }}</p></td>
+                                <td><p>{{ row.username }}</p></td>
+                                <td><p>{{ row.account_created.strftime("%d.%m.%Y @ %H:%M") }}</p></td>
+                                <td><p>{{ row.last_login.strftime("%d.%m.%Y @ %H:%M") }}</p></td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Edit user settings -->
+                        <form action="/admin" method="post">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col" class="col-md-1">Admin</th>
+                                    <th scope="col" class="col-md-1">Secret</th>
+                                    <th scope="col" class="col-md-1">Deleted</th>
+                                    <th scope="col" class="col-md-1">Banned</th>
+                                    <th scope="col" class="col-md-5">Ban duration</th>
+                                    <th scope="col" class="col-md-2"></th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                <tr>
+                                    <td><input type="checkbox" class="form-control" name="admin"
+                                               {% if row.admin %}checked{% else %}{% endif %}></td>
+                                    <td><input type="checkbox" class="form-control" name="view_secret"
+                                               {% if row.view_secret %}checked{% else %}{% endif %}></td>
+                                    <td><input type="checkbox" class="form-control" name="deleted"
+                                               {% if row.deleted %}checked{% else %}{% endif %}></td>
+                                    <td><input type="checkbox" class="form-control" name="banned"
+                                               {% if row.banned %}checked{% else %}{% endif %}></td>
+                                    <td>
+                                        {% if row.ban_duration %}
+                                            <p>{{ row.ban_duration.strftime("%d.%m.%Y @ %H:%M") }}</p>
+                                        {% else %}
+                                            <p>None</p>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button type="submit" class="btn btn-danger btn-sm float-right"
+                                                name="save_changes" value="{{ row.user_id }}">
+                                            Save changes
+                                        </button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}
