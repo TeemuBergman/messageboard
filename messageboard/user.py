@@ -1,6 +1,6 @@
 # user.py
 
-import datetime
+from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_required, login_user, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -44,7 +44,7 @@ def login_post():
     sql = "UPDATE users " \
           "SET last_login = :time " \
           "WHERE user_id = :user_id;"
-    db.session.execute(sql, {"time": datetime.datetime.now(),
+    db.session.execute(sql, {"time": datetime.now(),
                              "user_id": user.user_id})
     db.session.commit()
     db.session.close()
@@ -80,7 +80,7 @@ def signup_post():
         return redirect(url_for("user_auth.signup"))
 
     # Create new user data and add it to the database
-    current_time = datetime.datetime.now()
+    current_time = datetime.now()
     sql = "INSERT INTO users (username, email, password_hash, account_created, last_login)" \
           "VALUES (:username, :email, :password_hash, :account_created, :last_login);"
     db.session.execute(sql, {"username": username,

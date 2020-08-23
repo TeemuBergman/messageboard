@@ -1,6 +1,6 @@
 # admin.py
 
-import datetime
+from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for
 from flask_login import login_required, current_user
 from messageboard import db
@@ -33,7 +33,7 @@ def new_category(category_secret, category_name, category_description):
     db.session.execute(sql, {"category_secret": category_secret,
                              "category_name": category_name,
                              "category_description": category_description,
-                             "category_created": datetime.datetime.now()
+                             "category_created": datetime.now()
                              })
     db.session.commit()
     db.session.close()

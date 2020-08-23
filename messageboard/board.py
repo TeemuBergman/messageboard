@@ -1,6 +1,6 @@
 # board.py
 
-import datetime
+from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, request
 from flask_login import login_required, current_user
 from . import db
@@ -173,7 +173,7 @@ def new_thread_post(category_id):
         return redirect(request.referrer)
 
     # Construct a new thread and first post
-    current_time = datetime.datetime.now()
+    current_time = datetime.now()
     sql = "WITH new_thread " \
           "AS (INSERT INTO threads (thread_name, category_id, thread_created) " \
           "VALUES (:thread_name, :category_id, :thread_created) " \
@@ -213,7 +213,7 @@ def post_reply(category_id, thread_id):
     db.session.execute(sql, {"message_content": content,
                              "thread_id": thread_id,
                              "user_id": current_user.user_id,
-                             "message_created": datetime.datetime.now()
+                             "message_created": datetime.now()
                              })
     db.session.commit()
     db.session.close()
@@ -253,7 +253,7 @@ def edit_message(message_id, message_content):
           "WHERE message_id = :message_id " \
           "AND user_id = :current_user;"
     db.session.execute(sql, {"message_content": message_content,
-                             "timestamp": datetime.datetime.now(),
+                             "timestamp": datetime.now(),
                              "message_id": message_id,
                              "current_user": current_user.user_id})
     db.session.commit()
