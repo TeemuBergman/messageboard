@@ -30,13 +30,24 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
 
-                <!-- Show if user IS logged in -->
+
                 {% if current_user.is_authenticated %}
+                    <!-- Show if user is logged in -->
                     <li class="nav-item active">
                         <a class="nav-link" href="{{ url_for("user_auth.profile") }}" class="navbar-item">
                             Profile<span class="sr-only">(current)</span>
                         </a>
                     </li>
+
+                    {% if current_user.admin %}
+                        <!-- Show if user is an admin -->
+                        <li class="nav-item active">
+                            <a class="nav-link" href="{{ url_for("admin_auth.control_panel") }}" class="navbar-item">
+                                Admin<span class="sr-only">(current)</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
                     <li class="nav-item active">
                         <a class="nav-link" href="{{ url_for("user_auth.logout") }}" class="navbar-item">
                             Log out<span class="sr-only">(current)</span>
@@ -44,8 +55,8 @@
                     </li>
                 {% endif %}
 
-                <!-- Show if user is NOT logged in -->
                 {% if not current_user.is_authenticated %}
+                    <!-- Show if user has not logged in -->
                     <li class="nav-item active">
                         <a class="nav-link" href="{{ url_for("user_auth.login") }}" class="navbar-item">
                             Log in<span class="sr-only">(current)</span>
@@ -57,6 +68,7 @@
                         </a>
                     </li>
                 {% endif %}
+
             </ul>
             <form class="form-inline my-2 my-lg-0" action="/board/results" method="GET">
                 <input class="form-control mr-sm-2" name="query" type="text" placeholder="Search" aria-label="Search">
