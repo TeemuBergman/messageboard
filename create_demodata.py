@@ -66,7 +66,8 @@ jane_doe = Users(
     password_hash = "sha256$ivlIjuur$207a6e2441576f269b8be79fcee47876d729c36cff483dc35e865e2ef25e1f63",
     email = "jane.doe@messageboard.com",
     account_created = datetime.now(),
-    last_login = datetime.now()
+    last_login = datetime.now(),
+    view_secret = True
 )
 
 # Add to DB
