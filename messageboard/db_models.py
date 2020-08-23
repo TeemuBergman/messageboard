@@ -16,10 +16,10 @@ class Users(UserMixin, db.Model):
     account_created = db.Column(db.DateTime, nullable = False)
     last_login = db.Column(db.DateTime, nullable = False)
     banned = db.Column(db.Boolean, nullable = False)
-    ban_duration = db.Column(db.DateTime, nullable = False)
-    is_admin = db.Column(db.Boolean, nullable = False, default = False)
-    can_view_secret = db.Column(db.Boolean, nullable = False, default = False)
-    deleted = db.Column(db.Boolean, nullable = False, default = False)
+    ban_duration = db.Column(db.DateTime)
+    is_admin = db.Column(db.Boolean, default = False)
+    can_view_secret = db.Column(db.Boolean, default = False)
+    deleted = db.Column(db.Boolean, default = False)
 
     def get_id(self):
         return self.user_id
