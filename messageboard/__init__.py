@@ -27,7 +27,9 @@ def create_app():
 
     # Init CLI commands
     from . import db_models
-    app.cli.add_command(db_models.init_db_command)
+    app.cli.add_command(db_models.init_db)
+    from . import create_demodata
+    app.cli.add_command(create_demodata.demo_data)
 
     # User session manager and user_id loader
     login_manager = LoginManager()
