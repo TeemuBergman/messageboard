@@ -1,15 +1,9 @@
 # create_demodata.py
 
-import os
 from datetime import datetime
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from messageboard.db_models import Categories, Users
-
-app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-db = SQLAlchemy(app)
+import click
+from flask.cli import with_appcontext
+from messageboard.db_models import db, Categories, Users
 
 # Create few categories
 general = Categories(
@@ -32,12 +26,6 @@ secret = Categories(
     category_secret = True,
     category_created = datetime.now()
 )
-
-# Add to DB
-db.session.add(general)
-db.session.add(coding)
-db.session.add(secret)
-db.session.commit()
 
 # Create one admin and few users
 # PW: admin
@@ -70,8 +58,18 @@ jane_doe = Users(
     view_secret = True
 )
 
-# Add to DB
-db.session.add(admin)
-db.session.add(john_doe)
-db.session.add(jane_doe)
-db.session.commit()
+
+# CLI command for creating demo data
+@click.command("demodata")
+@with_appcontext
+def demo_data():
+    # Categories
+    db.session.add(general)
+    db.session.add(coding)
+    db.session.add(secret)
+    # Users
+    db.session.add(admin)
+    db.session.add(john_doe)
+    db.session.add(jane_doe)
+    # Commit
+    db.session.commit()
