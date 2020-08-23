@@ -3,7 +3,7 @@
 
 "Message board" is also a practical work for the University of Helsinki's Department of Computer Science: Database application course ([TKT20011](https://hy-tsoha.github.io/materiaali/index)).
 
-Demo: [messageboard-tb.herokuapp.com](messageboard-tb.herokuapp.com)
+Demo: [messageboard-tb.herokuapp.com](http://messageboard-tb.herokuapp.com)
 
 Demo users:
 * admin@messageboard.com / admin
@@ -43,7 +43,7 @@ ToDo:
 
 
 #### 09.08.2020
-At the moment the Message Board -application can be tested at: [messageboard-tb.herokuapp.com](messageboard-tb.herokuapp.com) and its current features are:
+At the moment the Message Board -application can be tested at: [messageboard-tb.herokuapp.com](http://messageboard-tb.herokuapp.com) and its current features are:
 - User can register, login and logout
 - User can create new threads
 - User can post/reply to threads
@@ -110,4 +110,4 @@ Create database demo data: `flask demo-data`
 Teemu Bergman
 
 ## LICENSE
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the GPL-3.0 License. See `LICENSE` for more information.
