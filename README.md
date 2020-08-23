@@ -5,6 +5,11 @@
 
 Demo: [messageboard-tb.herokuapp.com](messageboard-tb.herokuapp.com)
 
+Demo users:
+admin@messageboard.com / admin
+john.doe@messageboard.com / johndoe
+jane.doe@messageboard.com /janedoe
+
 ## STATUS
 
 #### 23.08.2020
@@ -83,6 +88,10 @@ At the moment the Message Board -application can be tested at: [messageboard-tb.
         * python-dotenv
         * Werkzeug
         * PostgreSQL
+        
+### Commands
+Initialize database: `flask init-db`
+
 
 ## AUTHOR
 Teemu Bergman
