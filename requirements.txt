@@ -1,3 +1,4 @@
+click
 gunicorn
 flask
 flask-login
