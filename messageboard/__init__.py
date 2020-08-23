@@ -42,10 +42,10 @@ def create_app():
         from . import routes
         from . import board
         from . import user
-        from .admin import admin
+        from . import admin
 
         # Register Blueprints
-        # Main routes
+        # Main
         from .routes import main as main_blueprint
         app.register_blueprint(main_blueprint)
 
