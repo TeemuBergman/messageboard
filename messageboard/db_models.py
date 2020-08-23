@@ -17,7 +17,7 @@ class Users(UserMixin, db.Model):
     last_login = db.Column(db.DateTime, nullable = False)
     banned = db.Column(db.Boolean, default = False)
     ban_duration = db.Column(db.DateTime)
-    is_admin = db.Column(db.Boolean, default = False)
+    admin = db.Column(db.Boolean, default = False)
     view_secret = db.Column(db.Boolean, default = False)
     deleted = db.Column(db.Boolean, default = False)
 
