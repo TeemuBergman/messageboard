@@ -213,7 +213,6 @@ def new_thread_post(category_id):
                              "message_created": current_time
                              })
     db.session.commit()
-    db.session.close()
 
     return redirect(url_for("board.list_threads",
                             category_id = category_id
@@ -240,7 +239,6 @@ def post_reply(category_id, thread_id):
                              "message_created": datetime.now()
                              })
     db.session.commit()
-    db.session.close()
 
     return redirect(request.referrer)
 
@@ -255,7 +253,6 @@ def delete_message(thread_id, message_id):
     db.session.execute(sql, {"message_id": message_id,
                              "current_user": current_user.user_id})
     db.session.commit()
-    db.session.close()
 
     # Check if it was last message on thread
     sql = "SELECT COUNT(thread_id) as total " \
@@ -281,7 +278,6 @@ def edit_message(message_id, message_content):
                              "message_id": message_id,
                              "current_user": current_user.user_id})
     db.session.commit()
-    db.session.close()
 
 
 # Get one row of selected category
