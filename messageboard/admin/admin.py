@@ -1,7 +1,7 @@
 # admin.py
 
 from datetime import datetime
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, request
 from flask_login import login_required, current_user
 from messageboard import db
 
@@ -11,9 +11,40 @@ admin_auth = Blueprint("admin_auth", __name__)
 # Admin control panel
 @admin_auth.route("/", methods = ["GET", "POST"])
 @login_required
-def admin_control_panel():
-    if current_user.is_admin:
-        return render_template("/admin/admin.html")
+def control_panel():
+    if current_user.admin:
+        if "save_changes" in request.form:
+            admin = request.form.get("admin")
+            view_secret = request.form.get("view_secret")
+            deleted = request.form.get("deleted")
+            banned = request.form.get("banned")
+            user_id = request.form["save_changes"]
+
+            # Update user privileges
+            sql = "UPDATE users " \
+                  "SET admin = :admin, view_secret = :view_secret, banned = :banned, deleted = :deleted " \
+                  "WHERE user_id = :user_id;"
+            db.session.execute(sql, {"user_id": user_id,
+                                     "admin": admin,
+                                     "view_secret": view_secret,
+                                     "banned": banned,
+                                     "deleted": deleted
+                                     })
+            db.session.commit()
+
+        return render_template("/admin/admin.html",
+                               users = get_users())
+    else:
+        return redirect(url_for("main.index"))
+
+
+# Admin control panel
+@admin_auth.route("/users", methods = ["GET", "POST"])
+@login_required
+def edit_users():
+    if current_user.admin:
+        return render_template("/admin/users.html",
+                               users = get_users())
     else:
         return redirect(url_for("main.index"))
 
@@ -36,7 +67,6 @@ def new_category(category_secret, category_name, category_description):
                              "category_created": datetime.now()
                              })
     db.session.commit()
-    db.session.close()
 
 
 # Delete category
@@ -60,7 +90,6 @@ def switch_category_secret(category_id):
     db.session.execute(sql, {"category_id": category_id,
                              "category_secret": category_secret})
     db.session.commit()
-    db.session.close()
 
 
 # Get all threads of specific category
@@ -92,7 +121,6 @@ def switch_ban_user(user_id):
     db.session.execute(sql, {"user_id": user_id,
                              "banned": banned})
     db.session.commit()
-    db.session.close()
 
 
 # Delete or restore user -switch
@@ -107,7 +135,6 @@ def switch_delete_user(user_id):
     db.session.execute(sql, {"user_id": user_id,
                              "banned": deleted})
     db.session.commit()
-    db.session.close()
 
 
 # Allow user to view secret categories -switch
@@ -122,4 +149,3 @@ def switch_user_view_secrets(user_id):
     db.session.execute(sql, {"user_id": user_id,
                              "view_secret": view_secret})
     db.session.commit()
-    db.session.close()
