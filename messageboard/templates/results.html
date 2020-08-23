@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="ibox-content forum-container">
+        <!-- Header for threads -->
+        <div class="row">
+            <div class="col-md-12">
+                <h3 class="text-break">Search results</h3>
+            </div>
+        </div>
+
+        <!-- List results -->
+        {% if messages.rowcount %}
+            {% for row in messages %}
+                <div class="forum-item position-relative">
+                    <!-- Time and posted by -->
+                    <div class="row">
+                        <div class="col-md-9">
+                            <small>{{ row.message_created.strftime("%d.%m.%Y @ %H:%M") }}</small>
+                            {% if row.message_edited %}
+                                <small>(Edited: {{ row.message_edited.strftime("%d.%m.%Y @ %H:%M") }})</small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-3 text-right">
+                            <small>Posted by:</small>
+                        </div>
+
+                        <!-- Message content -->
+                        <div class="col-md-9">
+                            <p style="white-space: pre-wrap">{{ row.message_content }}</p>
+                        </div>
+
+                        <!-- Username and other info -->
+                        <div class="col-md-3 text-right">
+                            <p class="text-break">
+                                {{ row.username }}
+                                <!-- Show if user is deleted or banned -->
+                                {% if row.deleted %}
+                                    <br>
+                                    <small>(Deleted user)</small>
+                                {% elif row.banned %}
+                                    <br>
+                                    <small>(Banned user)</small>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <a href="/board/{{ row.category_id }}/{{ row.thread_id }}" class="stretched-link"></a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="forum-item">
+                <div class="row">
+                    <div class="col-md-12">
+                        <br>
+                        <p class="text-center">Nothing found!</p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
