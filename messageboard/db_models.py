@@ -39,7 +39,7 @@ class Categories(db.Model):
 class Threads(db.Model):
     __tablename__ = "threads"
     thread_id = db.Column(db.Integer, primary_key = True)
-    thread_visible = db.Column(db.Boolean, nullable = False)
+    thread_visible = db.Column(db.Boolean, nullable = False, default = True)
     thread_name = db.Column(db.String(256), unique = True, nullable = False)
     thread_created = db.Column(db.DateTime, nullable = False)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.category_id"))
@@ -51,6 +51,7 @@ class Messages(db.Model):
     message_id = db.Column(db.Integer, primary_key = True)
     message_content = db.Column(db.String, nullable = False)
     message_created = db.Column(db.DateTime, nullable = False)
+    message_edited = db.Column(db.DateTime)
     thread_id = db.Column(db.Integer, db.ForeignKey("threads.thread_id"))
     user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))
 
