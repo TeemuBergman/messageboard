@@ -47,7 +47,6 @@ def login_post():
     db.session.execute(sql, {"time": datetime.now(),
                              "user_id": user.user_id})
     db.session.commit()
-    db.session.close()
 
     return redirect(url_for("main.index"))
 
@@ -90,7 +89,6 @@ def signup_post():
                              "last_login": current_time
                              })
     db.session.commit()
-    db.session.close()
 
     return redirect(url_for("user_auth.login"))
 
@@ -127,7 +125,6 @@ def profile():
                   "WHERE user_id = :user_id;"
             db.session.execute(sql, {"user_id": current_user.user_id})
             db.session.commit()
-            db.session.close()
 
             # Log out user
             return redirect(url_for("user_auth.logout"))
@@ -160,7 +157,6 @@ def profile():
                                          "password": password,
                                          "user_id": current_user.user_id})
                 db.session.commit()
-                db.session.close()
 
             # Refresh profile page
             return redirect(request.referrer)
