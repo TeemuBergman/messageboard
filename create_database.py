@@ -3,7 +3,7 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from .messageboard.db_models import Categories, Threads, Messages, Users
+from db_models import Categories, Threads, Messages, Users
 
 app = Flask(__name__)
 
