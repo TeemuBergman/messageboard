@@ -24,6 +24,7 @@ User functionality:
     * Edit users own messages
     * Remove users own messages (if last message also thread is deleted)
     * View hidden categories (if user has the rights)
+    * Search keywords from messages (not on secret categories at the moment)
 
 ToDo:
 - Create admin control panel (functionality is there, but HTML is undone at the moment)
@@ -91,6 +92,7 @@ At the moment the Message Board -application can be tested at: [messageboard-tb.
         
 ### Commands
 Initialize database: `flask init-db`
+Create database demo data: `flask demo-data`
 
 
 ## AUTHOR
