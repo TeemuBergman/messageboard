@@ -42,7 +42,7 @@ def create_app():
         from . import routes
         from . import board
         from . import user
-        from . import admin
+        from .admin import admin
 
         # Register Blueprints
         # Main
