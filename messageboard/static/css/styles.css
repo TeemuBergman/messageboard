@@ -240,4 +240,7 @@ a.forum-item-title:hover {
 .m-b-sm {
     margin-bottom: 10px;
 }
-                                    
+
+.breadcrumb {
+    margin-bottom: 0rem;
+}
