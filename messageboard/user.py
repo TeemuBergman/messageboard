@@ -81,7 +81,7 @@ def signup_post():
 
     # Create new user data and add it to the database
     current_time = datetime.now()
-    sql = "INSERT INTO users (username, email, password_hash, account_created, last_login)" \
+    sql = "INSERT INTO users (username, email, password_hash, account_created, last_login) " \
           "VALUES (:username, :email, :password_hash, :account_created, :last_login);"
     db.session.execute(sql, {"username": username,
                              "email": email,
