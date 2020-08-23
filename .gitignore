@@ -149,6 +149,4 @@ dmypy.json
 cython_debug/
 
 /_temp/
-/messageboard/messages/
-/messageboard/admin/
 /.gitignore
