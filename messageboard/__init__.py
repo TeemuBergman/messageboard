@@ -25,6 +25,10 @@ def create_app():
     # Init DB
     db.init_app(app)
 
+    # Init CLI commands
+    from . import db_models
+    app.cli.add_command(db_models.init_db_command)
+
     # User session manager and user_id loader
     login_manager = LoginManager()
     login_manager.login_view = "auth.login"
@@ -38,7 +42,7 @@ def create_app():
 
     # All the elements of the message board
     with app.app_context():
-        # Include routes
+        # Import routes
         from . import routes
         from . import board
         from . import user
