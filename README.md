@@ -13,6 +13,8 @@ jane.doe@messageboard.com /janedoe
 ## STATUS
 
 #### 23.08.2020
+**Use demo user credentials (above) to view three different user scenarios.**
+
 User functionality:
 * Profile
     * Register a new user
@@ -25,9 +27,18 @@ User functionality:
     * Remove users own messages (if last message also thread is deleted)
     * View hidden categories (if user has the rights)
     * Search keywords from messages (not on secret categories at the moment)
+    
+Admin functionality:
+* Admin panel
+    * View all users and their account data (except passwords)
+    * Add or remove rights for secret categories
+    * Add or remove admin rights
+    * Ban or remove ban an account
+    * Delete on revive an account
 
 ToDo:
-- Create admin control panel (functionality is there, but HTML is undone at the moment)
+- Finish admin control panel (It's a bit of a mess now)
+- Implement role base authorization (Now admin side is a hack)
 - Clean up HTML and CSS to make the app nicer looking
 
 
