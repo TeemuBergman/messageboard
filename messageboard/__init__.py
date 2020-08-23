@@ -50,7 +50,7 @@ def create_app():
         app.register_blueprint(main_blueprint)
 
         # Admin
-        from admin.admin import admin_auth as auth_admin_blueprint
+        from .admin.admin import admin_auth as auth_admin_blueprint
         app.register_blueprint(auth_admin_blueprint, url_prefix = "/admin")
 
         # Authorised user
