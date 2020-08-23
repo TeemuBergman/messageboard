@@ -10,20 +10,24 @@ db = SQLAlchemy()
 
 # Page not found (404) handler
 def page_not_found(e):
-  return render_template('404.html'), 404
+    return render_template("404.html"), 404
 
 
 def create_app():
-    app = Flask(__name__, instance_relative_config = False, template_folder = "templates", static_folder = "static")
+    app = Flask(__name__,
+                instance_relative_config = False,
+                template_folder = "templates",
+                static_folder = "static")
 
     # Get config from config.py
-    app.config.from_object('config.Config')
+    app.config.from_object("config.Config")
 
+    # Init DB
     db.init_app(app)
 
     # User session manager and user_id loader
     login_manager = LoginManager()
-    login_manager.login_view = 'auth.login'
+    login_manager.login_view = "auth.login"
     login_manager.init_app(app)
 
     from .db_models import Users
@@ -36,14 +40,26 @@ def create_app():
     with app.app_context():
         # Include routes
         from . import routes
-        from . import routes_auth
-        # from .admin import admin
+        from . import board
+        from . import user
+        from .admin import admin
 
         # Register Blueprints
-        from .routes_auth import auth as auth_blueprint
-        app.register_blueprint(auth_blueprint)
+        # Main routes
         from .routes import main as main_blueprint
         app.register_blueprint(main_blueprint)
+
+        # Admin
+        from admin.admin import admin_auth as auth_admin_blueprint
+        app.register_blueprint(auth_admin_blueprint, url_prefix = "/admin")
+
+        # Authorised user
+        from .user import user_auth as user_auth_blueprint
+        app.register_blueprint(user_auth_blueprint)
+
+        # Message board
+        from .board import board as board_blueprint
+        app.register_blueprint(board_blueprint, url_prefix = "/board")
 
         # Register page not found (404) handler
         app.register_error_handler(404, page_not_found)
