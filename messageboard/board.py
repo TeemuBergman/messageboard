@@ -8,6 +8,31 @@ from . import db
 board = Blueprint("board", __name__)
 
 
+# Search messages
+@board.route("/results", methods = ["GET", "POST"])
+def search_messages():
+    query = request.args["query"]
+    sql = "SELECT " \
+          "c.category_id, " \
+          "c.category_name, " \
+          "c.category_secret, " \
+          "t.thread_id, " \
+          "t.thread_name, " \
+          "m.message_content, " \
+          "m.message_created, " \
+          "u.username " \
+          "FROM threads AS t " \
+          "JOIN messages AS m ON m.thread_id = t.thread_id " \
+          "JOIN categories AS c ON c.category_id = t.category_id " \
+          "JOIN users AS u ON u.user_id = m.user_id " \
+          "WHERE LOWER(message_content) LIKE LOWER(:query) " \
+          "AND c.category_secret = False;"
+    messages = db.session.execute(sql, {"query": "%" + query + "%"})
+
+    return render_template("results.html",
+                           messages = messages)
+
+
 # List categories
 @board.route("/")
 def index():
