@@ -28,8 +28,8 @@ def index():
           "COUNT(DISTINCT t.thread_id) AS threads_count, " \
           "COUNT(DISTINCT m.message_id) AS messages_count " \
           "FROM categories AS c " \
-          "JOIN threads AS t ON c.category_id = t.category_id " \
-          "JOIN messages AS m ON t.thread_id = m.thread_id " \
+          "FULL OUTER JOIN threads AS t ON c.category_id = t.category_id " \
+          "FULL OUTER JOIN messages AS m ON t.thread_id = m.thread_id " \
           "WHERE c.category_secret = false " \
           "OR c.category_secret = :category_secret " \
           "GROUP BY c.category_id, c.category_name, c.category_description " \
@@ -116,7 +116,6 @@ def list_messages(category_id, thread_id):
           "JOIN users u on u.user_id = m.user_id " \
           "JOIN threads t on t.thread_id = m.thread_id " \
           "WHERE m.thread_id = :thread_id " \
-          "AND m.deleted = False " \
           "ORDER BY m.message_created;"
     messages = db.session.execute(sql, {"thread_id": thread_id})
     thread_info = db.session.execute(sql, {"thread_id": thread_id}).fetchone()
@@ -158,7 +157,7 @@ def new_thread(category_id):
                            )
 
 
-# Send new thread info to database
+# Send new thread to database
 @board.route("/<category_id>/createthreadpost", methods = ["POST"])
 @login_required
 def new_thread_post(category_id):
@@ -175,8 +174,8 @@ def new_thread_post(category_id):
     # Construct a new thread and first post
     current_time = datetime.now()
     sql = "WITH new_thread " \
-          "AS (INSERT INTO threads (thread_name, category_id, thread_created) " \
-          "VALUES (:thread_name, :category_id, :thread_created) " \
+          "AS (INSERT INTO threads (thread_visible, thread_name, category_id, thread_created) " \
+          "VALUES (True, :thread_name, :category_id, :thread_created) " \
           "RETURNING thread_id) " \
           "INSERT INTO messages (message_content, thread_id, user_id, message_created) " \
           "VALUES (:message_content, (SELECT thread_id FROM new_thread), :user_id, :message_created);"
