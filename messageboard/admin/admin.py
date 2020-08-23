@@ -13,7 +13,7 @@ admin_auth = Blueprint("admin_auth", __name__)
 @login_required
 def admin_control_panel():
     if current_user.is_admin:
-        return render_template("admin/admin.html")
+        return render_template("/admin/admin.html")
     else:
         return redirect(url_for("main.index"))
 
@@ -81,7 +81,7 @@ def get_users():
 
 
 # Ban or lift ban -switch
-def switch_user_ban(user_id):
+def switch_ban_user(user_id):
     # Get current banned status and flip it
     banned = not current_user.banned
 
@@ -91,6 +91,21 @@ def switch_user_ban(user_id):
           "WHERE user_id = :user_id;"
     db.session.execute(sql, {"user_id": user_id,
                              "banned": banned})
+    db.session.commit()
+    db.session.close()
+
+
+# Delete or restore user -switch
+def switch_delete_user(user_id):
+    # Get current deleted status and flip it
+    deleted = not current_user.banned
+
+    # Set new deleted status
+    sql = "UPDATE users " \
+          "SET deleted = :deleted " \
+          "WHERE user_id = :user_id;"
+    db.session.execute(sql, {"user_id": user_id,
+                             "banned": deleted})
     db.session.commit()
     db.session.close()
 
