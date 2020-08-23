@@ -113,13 +113,13 @@ def switch_delete_user(user_id):
 # Allow user to view secret categories -switch
 def switch_user_view_secrets(user_id):
     # Get current view secrets status and flip it
-    can_view_secret = not current_user.can_view_secret
+    view_secret = not current_user.view_secret
 
     # Set new banned status
     sql = "UPDATE users " \
-          "SET can_view_secret = :can_view_secret " \
+          "SET view_secret = :view_secret " \
           "WHERE user_id = :user_id;"
     db.session.execute(sql, {"user_id": user_id,
-                             "can_view_secret": can_view_secret})
+                             "view_secret": view_secret})
     db.session.commit()
     db.session.close()

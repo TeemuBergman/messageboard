@@ -13,7 +13,7 @@ board = Blueprint("board", __name__)
 def index():
     # Check if current user can view secret categories
     if current_user.is_authenticated:
-        sql = "SELECT can_view_secret " \
+        sql = "SELECT view_secret " \
               "FROM users " \
               "WHERE user_id = :user_id;"
         category_secret = db.session.execute(sql, {"user_id": current_user.user_id}).first()[0]
