@@ -16,7 +16,7 @@ def login():
     return render_template("login.html")
 
 
-@user_auth.route("/login", methods = ["POST"])
+@user_auth.route("/login", methods = ["GET", "POST"])
 def login_post():
     # Get login info from form
     email = request.form.get("email")
@@ -25,18 +25,16 @@ def login_post():
 
     # Get current user object
     user = Users.query.filter_by(email = email).first()
-    # sql = "SELECT * FROM users WHERE email = :email"
-    # user = db.session.execute(sql, {"email": email}).first()
 
     # Look for the user and check password hash match and redirect if they don"t
-    if user.deleted:
-        flash("User account deleted!")
-        return redirect(url_for("user_auth.login"))
     if not user:
         flash("Wrong email. \n Please try again!")
         return redirect(url_for("user_auth.login"))
     if not check_password_hash(user.password_hash, password):
         flash("Wrong password. \n Please try again!")
+        return redirect(url_for("user_auth.login"))
+    if user.deleted:
+        flash("User account deleted!")
         return redirect(url_for("user_auth.login"))
 
     # Log in user
