@@ -1,5 +1,6 @@
 # db_models.py
-
+import click
+from flask.cli import with_appcontext
 from flask_login import UserMixin
 from . import db
 
@@ -51,3 +52,9 @@ class Messages(db.Model):
     message_created = db.Column(db.DateTime, nullable = False)
     thread_id = db.Column(db.Integer, db.ForeignKey("threads.thread_id"))
     user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))
+
+
+@click.command("init-db")
+@with_appcontext
+def init_db_command():
+    db.create_all()
