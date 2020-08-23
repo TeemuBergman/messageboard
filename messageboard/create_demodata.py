@@ -60,7 +60,7 @@ jane_doe = Users(
 
 
 # CLI command for creating demo data
-@click.command("demodata")
+@click.command("demo-data")
 @with_appcontext
 def demo_data():
     # Categories
