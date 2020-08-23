@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
@@ -16,11 +16,11 @@
 
 <body>
 
-<div class="container">
+<div class="container-md">
 
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="{{ url_for('main.index') }}">Message Board</a>
+        <a class="navbar-brand" href="{{ url_for("main.index") }}">Message Board</a>
 
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,12 +33,12 @@
                 <!-- Show if user IS logged in -->
                 {% if current_user.is_authenticated %}
                     <li class="nav-item active">
-                        <a class="nav-link" href="{{ url_for('auth.profile') }}" class="navbar-item">
+                        <a class="nav-link" href="{{ url_for("user_auth.profile") }}" class="navbar-item">
                             Profile<span class="sr-only">(current)</span>
                         </a>
                     </li>
                     <li class="nav-item active">
-                        <a class="nav-link" href="{{ url_for('auth.logout') }}" class="navbar-item">
+                        <a class="nav-link" href="{{ url_for("user_auth.logout") }}" class="navbar-item">
                             Log out<span class="sr-only">(current)</span>
                         </a>
                     </li>
@@ -47,12 +47,12 @@
                 <!-- Show if user is NOT logged in -->
                 {% if not current_user.is_authenticated %}
                     <li class="nav-item active">
-                        <a class="nav-link" href="{{ url_for('auth.login') }}" class="navbar-item">
+                        <a class="nav-link" href="{{ url_for("user_auth.login") }}" class="navbar-item">
                             Log in<span class="sr-only">(current)</span>
                         </a>
                     </li>
                     <li class="nav-item active">
-                        <a class="nav-link" href="{{ url_for('auth.signup') }}" class="navbar-item">
+                        <a class="nav-link" href="{{ url_for("user_auth.signup") }}" class="navbar-item">
                             Sign up<span class="sr-only">(current)</span>
                         </a>
                     </li>
@@ -62,12 +62,17 @@
     </nav>
 
     <!-- Message board content -->
+    {% block breadcrumb %}{% endblock %}
+
+    <!-- Message board content -->
+    {% block content %}{% endblock %}
+
+    <!-- Footer -->
     <div class="row">
-        <div class="col-lg-12">
-            <div class="wrapper">
-                {% block content %}
-                {% endblock %}
-            </div>
+        <div class="col">
+            <p class="text-center">
+                <small>Teemu Bergman - 2020</small>
+            </p>
         </div>
     </div>
 </div>

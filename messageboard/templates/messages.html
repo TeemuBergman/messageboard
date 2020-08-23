@@ -1,57 +1,159 @@
 {% extends "base.html" %}
 
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a
+                    href="/board/{{ category_info.category_id }}">{{ category_info.category_name }}</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">{{ thread_info.thread_name }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
 {% block content %}
     <div class="ibox-content forum-container">
-
         <!-- Header for threads -->
         <div class="row">
-            <div class="col-md-6">
-                <h2>
-                    <a href="/{{ category_id }}">{{ thread_info.thread_name }}</a>
-                </h2>
-            </div>
-            <div class="col-md-6">
-                <p class="float-right forum-desc">
-                </p>
+            <div class="col-md-12">
+                <h3 class="text-break">{{ thread_info.thread_name }}</h3>
             </div>
         </div>
 
         <!-- List all messages -->
         {% for row in messages %}
             <div class="forum-item">
+                <!-- Time and posted by -->
                 <div class="row">
-                    <div class="col-md-10">
-                        <small><em>{{ row.message_created }}</em></small>
+                    <div class="col-md-9">
+                        <small>{{ row.message_created.strftime("%d.%m.%Y @ %H:%M") }}</small>
+                        {% if row.message_edited %}
+                            <small>(Edited: {{ row.message_edited.strftime("%d.%m.%Y @ %H:%M") }})</small>
+                        {% endif %}
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3 text-right">
                         <small>Posted by:</small>
                     </div>
                 </div>
 
+                <!-- Message content -->
                 <div class="row">
-                    <div class="col-md-10">
-                        <p>{{ row.message_content }}</p>
+                    <div class="col-md-9">
+                        <p style="white-space: pre-wrap">{{ row.message_content }}</p>
                     </div>
 
-                    <div class="col-md-2">
-                        <div>
-                            <p>{{ row.username }}</p>
-                        </div>
+                    <!-- Username and other info -->
+                    <div class="col-md-3 text-right">
+                        <p class="text-break">
+                            {{ row.username }}
+
+                            <!-- Show if user is deleted or banned -->
+                            {% if row.deleted %}
+                                <br>
+                                <small>(Deleted user)</small>
+                            {% elif row.banned %}
+                                <br>
+                                <small>(Deleted user)</small>
+                            {% endif %}
+                        </p>
+
+                        {% if row.user_id == current_user.user_id %}
+                            <!-- Delete or edit message -->
+                            <form method="post">
+                                <button type="button" class="btn btn-primary btn-sm"
+                                        onclick="toggle_visibility({{ row.message_id }})">
+                                    Edit
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
+                                        data-target="#exampleModal"
+                                        onclick="message_id({{ row.thread_id }}, {{ row.message_id }})">
+                                    Delete
+                                </button>
+                            </form>
+                        {% endif %}
+
                     </div>
                 </div>
+
+                {% if row.user_id == current_user.user_id %}
+                    <!-- Edit messages -->
+                    <div class="row visibility-{{ row.message_id }}" style="display: none">
+                        <div class="col-md-9">
+                            <form method="post">
+                                <div class="form-group">
+                                    <label for="edit_content">Edit message content</label>
+                                    <textarea class="form-control" id="edit_content" name="edit_content"
+                                              rows="5">{{ row.message_content }}</textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary" name="edit_message"
+                                        value="{{ row.message_id }}">
+                                    Submit changes
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
+
             </div>
         {% endfor %}
 
         {% if current_user.is_authenticated %}
-            <form action="/{{ category_id }}/{{ thread_info.thread_id }}/Reply" method="POST">
-                <h5>Reply to thread</h5>
-                <div class="form-group">
-                    <label for="content">Message content</label>
-                    <textarea class="form-control" id="content" name="content" rows="3"></textarea>
+            <!-- Form to post a reply to thread -->
+            <form action="/board/{{ category_info.category_id }}/{{ thread_info.thread_id }}/reply" method="POST">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4>Reply to thread</h4>
+                        <div class="form-group">
+                            <label for="content"></label>
+                            <textarea class="form-control" id="content" name="content" rows="8"
+                                      maxlength="5000"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="submit" class="btn btn-primary">Post a reply</button>
+                    </div>
+                    <div class="col-md-6">
+                        <p id="charactersRemaining" class="text-right">0/5000 characters</p>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Post a reply</button>
             </form>
-        {% endif %}
 
-    </div>
+            <!-- Delete message confirmation popup -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">
+                                Delete message - Please confirm
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-footer">
+                            <form method="post">
+                                <input id="thread_id" name="thread_id" type="hidden">
+                                <input id="message_id" name="message_id" type="hidden">
+                                <button id="delete_message" name="delete_message" type="submit"
+                                        class="btn btn-danger pull-left">
+                                    DELETE MESSAGE
+                                </button>
+                            </form>
+                            <button type="button" class="btn btn-secondary ml-auto"
+                                    data-dismiss="modal">
+                                CANCEL
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- Scripts for message functionality -->
+            <script type="text/javascript" src="/static/js/character-counter.js"></script>
+            <script type="text/javascript" src="/static/js/message_id.js"></script>
+            <script type="text/javascript" src="/static/js/toggle_visibility.js"></script>
+        {% endif %}
 {% endblock %}

@@ -1,30 +1,49 @@
 {% extends "base.html" %}
 
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">Home</li>
+        </ol>
+    </nav>
+{% endblock %}
+
 {% block content %}
     <div class="ibox-content forum-container">
 
         <!-- Header for categories -->
         <div class="row">
-            <div class="col-md-6">
-                <h2>Welcome to Message Board!</h2>
-                <p class="forum-desc">Total threads: {{ sum_threads }} and messages: {{ sum_messages }}</p>
+            <div class="col">
+                {% if current_user.is_authenticated %}
+                    <h3>Welcome to Message Board, {{ user.username }}!</h3>
+                {% else %}
+                    <h3>Welcome to Message Board!</h3>
+                {% endif %}
+                <p class="forum-desc">Total threads: {{ sum_threads }} Messages: {{ sum_messages }}
+                    Users: {{ sum_users }}</p>
             </div>
         </div>
 
         <!-- List all categories -->
         {% for row in categories %}
-            <div class="forum-item">
+            <div class="forum-item position-relative">
                 <div class="row">
-
-                    <div class="col-md-10">
-                        <a href="/{{ row.category_id }}" class="forum-item-title">
-                            {{ row.category_name }}
-                        </a>
-                        <div class="forum-sub-title">
-                            {{ row.category_description }}
-                        </div>
+                    <div class="col">
+                        <h5>{{ row.category_name }}</h5>
+                        <div class="forum-sub-title"><p>{{ row.category_description }}</p></div>
                     </div>
 
+                    <div class="col-md-2 text-center">
+                        <h5>{{ row.threads_count }}</h5>
+                        <div class="forum-sub-title">Threads</div>
+                    </div>
+
+                    <div class="col-md-2 text-center">
+                        <h5>{{ row.messages_count }}</h5>
+                        <div class="forum-sub-title">Messages</div>
+                    </div>
+
+                    <a href="/board/{{ row.category_id }}" class="stretched-link"></a>
                 </div>
             </div>
         {% endfor %}

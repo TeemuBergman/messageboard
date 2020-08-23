@@ -5,14 +5,11 @@
         <div class="row">
 
             <!-- Header for profile page -->
-            <div class="col-md-6">
-                <h2>Welcome, {{ username }}!</h2>
-                <p>Here's your user info</p>
+            <div class="col-md-12">
+                <h2>Welcome, {{ username }}</h2>
+                <p>Here"s your user info. You can change your username and/or email. Click "delete user" to
+                    permanently delete your account.</p>
                 <br>
-            </div>
-            <div class="col-md-6">
-                <p class="float-right forum-desc">
-                </p>
             </div>
 
             <!-- List user info -->
@@ -20,22 +17,129 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <th scope="col">Username</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Registered</th>
-                        <th scope="col">Last login</th>
+                        <th scope="col" class="col-md-2">Username</th>
+                        <th scope="col" class="col-md-2">Email</th>
+                        <th scope="col" class="col-md-2">Password</th>
+                        {% if banned %}
+                            <th scope="col">Banned</th>
+                            <th scope="col">Ban duration</th>
+                        {% endif %}
+                        <th scope="col" class="col-md-2">Registered</th>
+                        <th scope="col" class="col-md-2">Last login</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
                         <td>{{ username }}</td>
                         <td>{{ email }}</td>
-                        <td>{{ registered }}</td>
-                        <td>{{ last_login }}</td>
+                        <td>* * * * *</td>
+                        {% if banned %}
+                            <td>Yes</td>
+                            <td>{{ ban_duration.strftime("%d.%m.%Y @ %H:%M") }}</td>
+                        {% endif %}
+                        <td>{{ registered.strftime("%d.%m.%Y @ %H:%M") }}</td>
+                        <td>{{ last_login.strftime("%d.%m.%Y @ %H:%M") }}</td>
                     </tr>
                     </tbody>
                 </table>
             </div>
+
+            <div class="col-md-12">
+                <hr>
+            </div>
+
+            <div class="col-md-9">
+                <!-- Edit profile -->
+                <button type="button" class="btn btn-primary" data-toggle="modal"
+                        data-target="#edit_profile">
+                    Change email and password
+                </button>
+            </div>
+
+            <!-- Delete user -->
+            <div class="col-md-3">
+                <button type="button" class="btn btn-danger float-right" data-toggle="modal"
+                        data-target="#delete_profile">
+                    DELETE USER
+                </button>
+            </div>
+
+            <!-- Edit profile popup -->
+            <div class="modal fade" id="edit_profile" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">
+                                Edit profile
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="/profile" method="POST">
+                                <div class="form-group">
+                                    <label for="email_1">New email (optional)</label>
+                                    <input name="email_1" class="form-control" type="email" value="">
+                                    <label for="email_2">Confirm new email</label>
+                                    <input name="email_2" class="form-control" type="email" value="">
+                                    <label for="new_password_1">New password (optional)</label>
+                                    <input name="new_password_1" class="form-control" type="password" value="">
+                                    <label for="new_password_2">Confirm new password</label>
+                                    <input name="new_password_2" class="form-control" type="password" value="">
+                                    <hr>
+                                    <label for="password">Enter your current password to save changes</label>
+                                    <input name="password" class="form-control" type="password" value="">
+                                </div>
+                                <button type="submit" class="btn btn-danger float-left" name="edit_profile">
+                                    Save edits
+                                </button>
+                                <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">
+                                    Cancel
+                                </button>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete user confirmation popup -->
+            <div class="modal fade" id="delete_profile" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">
+                                Delete profile - Please confirm
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>
+                                Do you really want to delete your profile?
+                                Your old messages will be left untouched.
+                                <b>This action cannot be undone!</b>
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            <form action="/profile" method="post">
+                                <button type="submit" class="btn btn-danger pull-left" name="delete_profile">
+                                    DELETE PROFILE
+                                </button>
+                            </form>
+                            <button type="button" class="btn btn-secondary ml-auto" data-dismiss="modal">
+                                CANCEL
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
