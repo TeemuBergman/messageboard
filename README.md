@@ -6,9 +6,9 @@
 Demo: [messageboard-tb.herokuapp.com](messageboard-tb.herokuapp.com)
 
 Demo users:
-admin@messageboard.com / admin
-john.doe@messageboard.com / johndoe
-jane.doe@messageboard.com /janedoe
+* admin@messageboard.com / admin
+* john.doe@messageboard.com / johndoe
+* jane.doe@messageboard.com /janedoe
 
 ## STATUS
 
