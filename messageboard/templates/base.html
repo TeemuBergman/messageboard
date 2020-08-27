@@ -10,7 +10,7 @@
     <!-- CSS imports -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.1/css/bootstrap.min.css"
           integrity="sha384-VCmXjywReHh4PwowAiWNagnWcLhlEJLA5buUprzK8rxFgeH0kww/aWY76TfkUoSX" crossorigin="anonymous">
-    <link rel="stylesheet" href="/static/css/styles.css">
+	<link rel="stylesheet" href="/static/css/styles.css">
 
 </head>
 
@@ -18,87 +18,89 @@
 
 <div class="container">
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="{{ url_for("main.index") }}">Message Board</a>
+	<!-- Navigation -->
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+		<a class="navbar-brand" href="{{ url_for("main.index") }}">
+			MESSAGE BOARD
+		</a>
 
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+				aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+		<div class="collapse navbar-collapse" id="navbarNav">
+			<ul class="navbar-nav mr-auto mt-2 mt-lg-0">
 
 
-                {% if current_user.is_authenticated %}
-                    <!-- Show if user is logged in -->
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{{ url_for("user_auth.profile") }}" class="navbar-item">
-                            Profile<span class="sr-only">(current)</span>
-                        </a>
-                    </li>
+				{% if current_user.is_authenticated %}
+					<!-- Show if user is logged in -->
+					<li class="nav-item active">
+						<a class="nav-link" href="{{ url_for("user_auth.profile") }}">
+							Profile<span class="sr-only">(current)</span>
+						</a>
+					</li>
 
-                    {% if current_user.admin %}
-                        <!-- Show if user is an admin -->
-                        <li class="nav-item active">
-                            <a class="nav-link" href="{{ url_for("admin_auth.control_panel") }}" class="navbar-item">
-                                Admin<span class="sr-only">(current)</span>
-                            </a>
-                        </li>
-                    {% endif %}
+					{% if current_user.admin %}
+						<!-- Show if user is an admin -->
+						<li class="nav-item active">
+							<a class="nav-link" href="{{ url_for("admin_auth.control_panel") }}">
+								Admin<span class="sr-only">(current)</span>
+							</a>
+						</li>
+					{% endif %}
 
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{{ url_for("user_auth.logout") }}" class="navbar-item">
-                            Log out<span class="sr-only">(current)</span>
-                        </a>
-                    </li>
-                {% endif %}
+					<li class="nav-item active">
+						<a class="nav-link" href="{{ url_for("user_auth.logout") }}">
+							Log out<span class="sr-only">(current)</span>
+						</a>
+					</li>
+				{% endif %}
 
-                {% if not current_user.is_authenticated %}
-                    <!-- Show if user has not logged in -->
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{{ url_for("user_auth.login") }}" class="navbar-item">
-                            Log in<span class="sr-only">(current)</span>
-                        </a>
-                    </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{{ url_for("user_auth.signup") }}" class="navbar-item">
-                            Sign up<span class="sr-only">(current)</span>
-                        </a>
-                    </li>
-                {% endif %}
+				{% if not current_user.is_authenticated %}
+					<!-- Show if user has not logged in -->
+					<li class="nav-item active">
+						<a class="nav-link" href="{{ url_for("user_auth.login") }}">
+							Log in<span class="sr-only">(current)</span>
+						</a>
+					</li>
+					<li class="nav-item active">
+						<a class="nav-link" href="{{ url_for("user_auth.signup") }}">
+							Sign up<span class="sr-only">(current)</span>
+						</a>
+					</li>
+				{% endif %}
 
-            </ul>
-            <form class="form-inline my-2 my-lg-0" action="/board/results" method="GET">
-                <input class="form-control mr-sm-2" name="query" type="text" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">Search</button>
-            </form>
-        </div>
+			</ul>
+			<form class="form-inline my-2 my-lg-0" action="/board/results" method="GET">
+				<input class="form-control mr-sm-2" name="query" type="text" placeholder="Search" aria-label="Search">
+				<button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
+			</form>
+		</div>
 
-    </nav>
+	</nav>
 
-    <!-- Message board content -->
-    {% block breadcrumb %}{% endblock %}
+	<!-- Message board content -->
+	{% block breadcrumb %}{% endblock %}
 
     <!-- Message board content -->
     {% block content %}{% endblock %}
 
-    <!-- Footer -->
-    <div class="row">
-        <div class="col">
-            <p class="text-center">
-                <small>Teemu Bergman - 2020</small>
-            </p>
-        </div>
-    </div>
+	<!-- Footer -->
+	<div class="row">
+		<div class="col">
+			<p class="text-center">
+				<small class="text-muted">Teemu Bergman - 2020</small>
+			</p>
+		</div>
+	</div>
 </div>
 
 
 <!-- JS for Bootstrap -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-        crossorigin="anonymous"></script>
+		integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+		crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
         integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
         crossorigin="anonymous"></script>
