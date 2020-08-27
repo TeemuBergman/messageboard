@@ -36,6 +36,7 @@ def create_app():
     login_manager.login_view = "auth.login"
     login_manager.init_app(app)
 
+    # Create user
     from .db_models import Users
 
     @login_manager.user_loader
@@ -44,19 +45,13 @@ def create_app():
 
     # All the elements of the message board
     with app.app_context():
-        # Import routes
-        from . import routes
-        from . import board
-        from . import user
-        from .admin import admin
-
         # Register Blueprints
         # Main
         from .routes import main as main_blueprint
         app.register_blueprint(main_blueprint)
 
         # Admin
-        from .admin.admin import admin_auth as auth_admin_blueprint
+        from admin import admin_auth as auth_admin_blueprint
         app.register_blueprint(auth_admin_blueprint, url_prefix = "/admin")
 
         # Authorised user
