@@ -1,9 +1,9 @@
 # create_demodata.py
 
 from datetime import datetime
-import click
-from flask.cli import with_appcontext
-from messageboard.db_models import db, Categories, Users
+
+# From message board
+from .db_models import Categories, Users
 
 # Create few categories
 general = Categories(
@@ -58,19 +58,3 @@ jane_doe = Users(
     account_created = datetime.now(),
     last_login = datetime.now()
 )
-
-
-# CLI command for creating demo data
-@click.command("demo-data")
-@with_appcontext
-def demo_data():
-    # Categories
-    db.session.add(general)
-    db.session.add(coding)
-    db.session.add(secret)
-    # Users
-    db.session.add(admin)
-    db.session.add(john_doe)
-    db.session.add(jane_doe)
-    # Commit
-    db.session.commit()
