@@ -1,72 +1,73 @@
 {% extends "base.html" %}
 
 {% block breadcrumb %}
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ category_info.category_name }}</li>
-        </ol>
-    </nav>
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Home</a></li>
+			<li class="breadcrumb-item active" aria-current="page">{{ category_info.category_name }}</li>
+		</ol>
+	</nav>
 {% endblock %}
 
 {% block content %}
-    <div class="ibox-content forum-container">
-
-        <!-- Header for threads -->
-        <div class="row">
-            <div class="col-md-6">
-                <h2>
-                    {{ category_info.category_name }}
-                </h2>
-            </div>
-            <div class="col-md-6">
-                {% if current_user.is_authenticated %}
-                    <form action="/board/{{ category_info.category_id }}/createthread">
-                        <button type="submit" class="btn btn-primary float-right">Create a new thread!</button>
-                    </form>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- List all threads -->
-        {% if threads.rowcount %}
-            {% for row in threads %}
-                <div class="forum-item position-relative">
-                    <div class="row">
-                        <div class="col-md-10">
-                            <h5 class="text-truncate">{{ row.thread_name }}</h5>
-                        </div>
-
-                        <div class="col-md-2 text-center">
-                            <h5>{{ row.messages_count }}</h5>
-                        </div>
-
-                        <div class="col-md-10">
-                            <p class="text-truncate">
-                                <small>{{ row.message_created.strftime("%d.%m.%Y @ %H:%M") }} <br>{{ row.username }}
-                                    said: {{ row.message_content }}</small>
-                            </p>
-                        </div>
-
-                        <div class="col-md-2 text-center">
+	<div class="ibox-content forum-container">
+		<!-- Header for threads -->
+		<div class="row">
+			<div class="col-md-6">
+				<h3>{{ category_info.category_name }}</h3>
+			</div>
+			<div class="col-md-6">
+				{% if current_user.is_authenticated %}
+					<form action="/board/{{ category_info.category_id }}/createthread">
+						<button type="submit" class="btn btn-primary float-right">Create a new thread!</button>
+					</form>
+				{% endif %}
+			</div>
+		</div>
+		<!-- List all threads -->
+		{% if threads.rowcount %}
+			{% for row in threads %}
+				<div class="forum-item position-relative">
+					<!-- Thread name and message count -->
+					<div class="row">
+						<div class="col-md-12">
+							<small>{{ row.message_created.strftime("%d.%m.%Y @ %H.%M") }}</small>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-10">
+							<h5 class="text-primary text-truncate">{{ row.thread_name }}</h5>
+						</div>
+						<div class="col-md-2 text-center">
+							<h5>{{ row.messages_count }}</h5>
+						</div>
+					</div>
+					<!-- Last message, username and message content -->
+					<div class="row">
+						<div class="col-md-10">
+							<div class="forum-sub-title text-truncate">{{ row.username }}:
+								{{ row.message_content }}</div>
+						</div>
+						<div class="col-md-2 text-center">
                         <span>
                             <small>Messages</small>
                         </span>
-                        </div>
-
-                        <a href="/board/{{ category_info.category_id }}/{{ row.thread_id }}" class="stretched-link"></a>
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <div class="forum-item position-relative">
-                <div class="row">
-                    <div class="col-md-12">
-                        <br>
-                        <p class="text-center">No threads here, please create one!</p>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-    </div>
+						</div>
+						<!-- Stretched link -->
+						<a href="/board/{{ row.category_id }}/{{ row.thread_id }}" class="stretched-link"></a>
+					</div>
+				</div>
+			{% endfor %}
+		{% else %}
+			<!-- Show if there are no threads -->
+			<div class="forum-item position-relative">
+				<div class="row">
+					<div class="col-md-12">
+						<br>
+						<p class="text-center">No threads here, please create one!</p>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+	</div>
 {% endblock %}

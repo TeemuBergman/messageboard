@@ -3,31 +3,38 @@
 {% block content %}
     <div class="ibox-content forum-container">
         <!-- Header for search results -->
-        <div class="row">
-            <div class="col-md-12">
-                <h3 class="text-break">Search results</h3>
-            </div>
-        </div>
+		<div class="row">
+			<div class="col-md-12">
+				<h3 class="text-break">Search results</h3>
+			</div>
+		</div>
 
-        <!-- List results -->
-        {% if messages.rowcount %}
-            {% for row in messages %}
-                <div class="forum-item position-relative">
-                    <!-- Time and posted by -->
-                    <div class="row">
-                        <div class="col-md-9">
-                            <small>{{ row.message_created.strftime("%d.%m.%Y @ %H:%M") }}</small>
-                            {% if row.message_edited %}
-                                <small>(Edited: {{ row.message_edited.strftime("%d.%m.%Y @ %H:%M") }})</small>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-3 text-right">
-                            <small>Posted by:</small>
-                        </div>
-
-                        <!-- Message content -->
-                        <div class="col-md-9">
-                            <p style="white-space: pre-wrap">{{ row.message_content }}</p>
+		<!-- List results -->
+		{% if messages.rowcount %}
+			{% for row in messages %}
+				<div class="forum-item position-relative">
+					<!-- Thread name -->
+					<div class="row">
+						<div class="col-md-12">
+							<h5 class="text-primary">{{ row.thread_name }}</h5>
+						</div>
+					</div>
+					<!-- Time and posted by -->
+					<div class="row">
+						<div class="col-md-9">
+							<small>{{ row.message_created.strftime("%d.%m.%Y @ %H.%M") }}</small>
+							{% if row.message_edited %}
+								<small>(Edited: {{ row.message_edited.strftime("%d.%m.%Y @ %H.%M") }})</small>
+							{% endif %}
+						</div>
+						<div class="col-md-3 text-right">
+							<small>Posted by:</small>
+						</div>
+					</div>
+					<div class="row">
+						<!-- Message content -->
+						<div class="col-md-9">
+							<p style="white-space: pre-wrap">{{ row.message_content }}</p>
                         </div>
 
                         <!-- Username and other info -->
