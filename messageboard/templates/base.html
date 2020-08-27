@@ -20,7 +20,7 @@
 
 	<!-- Navigation -->
 	<nav class="navbar navbar-expand-lg navbar-light bg-light">
-		<a class="navbar-brand" href="{{ url_for("main.index") }}">
+		<a class="navbar-brand text-white" href="{{ url_for("main.index") }}">
 			MESSAGE BOARD
 		</a>
 
@@ -36,7 +36,7 @@
 				{% if current_user.is_authenticated %}
 					<!-- Show if user is logged in -->
 					<li class="nav-item active">
-						<a class="nav-link" href="{{ url_for("user_auth.profile") }}">
+						<a class="nav-link text-white" href="{{ url_for("user_auth.profile") }}">
 							Profile<span class="sr-only">(current)</span>
 						</a>
 					</li>
@@ -44,14 +44,14 @@
 					{% if current_user.admin %}
 						<!-- Show if user is an admin -->
 						<li class="nav-item active">
-							<a class="nav-link" href="{{ url_for("admin_auth.control_panel") }}">
+							<a class="nav-link text-white" href="{{ url_for("admin_auth.control_panel") }}">
 								Admin<span class="sr-only">(current)</span>
 							</a>
 						</li>
 					{% endif %}
 
 					<li class="nav-item active">
-						<a class="nav-link" href="{{ url_for("user_auth.logout") }}">
+						<a class="nav-link text-white" href="{{ url_for("user_auth.logout") }}">
 							Log out<span class="sr-only">(current)</span>
 						</a>
 					</li>
@@ -60,12 +60,12 @@
 				{% if not current_user.is_authenticated %}
 					<!-- Show if user has not logged in -->
 					<li class="nav-item active">
-						<a class="nav-link" href="{{ url_for("user_auth.login") }}">
+						<a class="nav-link text-white" href="{{ url_for("user_auth.login") }}">
 							Log in<span class="sr-only">(current)</span>
 						</a>
 					</li>
 					<li class="nav-item active">
-						<a class="nav-link" href="{{ url_for("user_auth.signup") }}">
+						<a class="nav-link text-white" href="{{ url_for("user_auth.signup") }}">
 							Sign up<span class="sr-only">(current)</span>
 						</a>
 					</li>
@@ -74,7 +74,7 @@
 			</ul>
 			<form class="form-inline my-2 my-lg-0" action="/board/results" method="GET">
 				<input class="form-control mr-sm-2" name="query" type="text" placeholder="Search" aria-label="Search">
-				<button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
+				<button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
 			</form>
 		</div>
 
