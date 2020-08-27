@@ -3,8 +3,8 @@
 from datetime import datetime
 from flask import Blueprint, render_template, request
 from flask_login import current_user
-from user_roles import login_required, Role
-from messageboard import db
+from .user_roles import login_required, Role
+from . import db
 
 admin_auth = Blueprint("admin_auth", __name__)
 
@@ -14,7 +14,7 @@ admin_auth = Blueprint("admin_auth", __name__)
 @login_required(Role.ADMIN)
 def control_panel():
     if request.method == "POST":
-        # Save edit to user profile
+        # Get edits to user profile
         admin = request.form.get("admin")
         view_secret = request.form.get("view_secret")
         deleted = request.form.get("deleted")
@@ -24,16 +24,18 @@ def control_panel():
         # Update user privileges
         sql = """
               UPDATE users
-              SET admin = :admin, view_secret = :view_secret, banned = :banned, deleted = :deleted
+              SET
+                admin = :admin,
+                view_secret = :view_secret,
+                banned = :banned,
+                deleted = :deleted
               WHERE user_id = :user_id; 
               """
-        db.session.execute(sql, {
-            "user_id": user_id,
-            "admin": admin,
-            "view_secret": view_secret,
-            "banned": banned,
-            "deleted": deleted
-        })
+        db.session.execute(sql, {"user_id": user_id,
+                                 "admin": admin,
+                                 "view_secret": view_secret,
+                                 "banned": banned,
+                                 "deleted": deleted})
         db.session.commit()
 
     return render_template("/admin/admin.html",
@@ -52,11 +54,11 @@ def edit_users():
 def get_all_categories():
     sql = """
           SELECT
-          category_id,
-          category_name,
-          category_description,
-          category_secret,
-          category_created
+            category_id,
+            category_name,
+            category_description,
+            category_secret,
+            category_created
           FROM categories 
           ORDER BY category_name;
           """
@@ -109,10 +111,10 @@ def switch_category_secret(category_id):
 def get_threads(category_id):
     sql = """
           SELECT
-          thread_id,
-          thread_name,
-          thread_created,
-          category_id
+            thread_id,
+            thread_name,
+            thread_created,
+            category_id
           FROM threads
           WHERE category_id = :category_id
           ORDER BY thread_name;
@@ -124,18 +126,18 @@ def get_threads(category_id):
 def get_users():
     sql = """
           SELECT
-          user_id,
-          username,
-          password_hash,
-          email,
-          account_created,
-          last_login,
-          banned,
-          ban_duration,
-          admin,
-          view_secret,
-          deleted,
-          user_role
+            user_id,
+            username,
+            password_hash,
+            email,
+            account_created,
+            last_login,
+            banned,
+            ban_duration,
+            admin,
+            view_secret,
+            deleted,
+            user_role
           FROM users
           ORDER BY username;
           """
