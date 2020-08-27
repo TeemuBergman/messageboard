@@ -11,6 +11,7 @@ class Users(UserMixin, db.Model):
     __tablename__ = "users"
     user_id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(64), nullable = False)
+    user_role = db.Column(db.String(64), nullable = False)
     password_hash = db.Column(db.String(256), nullable = False)
     email = db.Column(db.String(256), nullable = False, unique = True)
     account_created = db.Column(db.DateTime, nullable = False)
@@ -23,6 +24,9 @@ class Users(UserMixin, db.Model):
 
     def get_id(self):
         return self.user_id
+
+    def get_user_role(self):
+        return self.user_role
 
 
 # Defining category model
@@ -40,7 +44,7 @@ class Threads(db.Model):
     __tablename__ = "threads"
     thread_id = db.Column(db.Integer, primary_key = True)
     thread_visible = db.Column(db.Boolean, nullable = False, default = True)
-    thread_name = db.Column(db.String(256), unique = True, nullable = False)
+    thread_name = db.Column(db.String(256), nullable = False)
     thread_created = db.Column(db.DateTime, nullable = False)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.category_id"))
 
