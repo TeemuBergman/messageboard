@@ -1,6 +1,20 @@
+/* Restrict application width */
+.container {
+    max-width: 800px;
+}
+
 body {
     margin-top: 20px;
-    background: #eee;
+    background: #f2f8ff;
+}
+
+.bg-light {
+    background-color: #afd3ff !important;
+}
+
+.breadcrumb {
+    margin-bottom: 0rem;
+    background-color: #def0ff;
 }
 
 .white-bg {
@@ -75,7 +89,7 @@ body {
 .forum-item {
     margin: 10px 0;
     padding: 10px 0 20px;
-    border-bottom: 1px solid #f1f1f1;
+    border-bottom: 1px solid #d5e0ef;
 }
 
 .views-number {
@@ -90,11 +104,12 @@ body {
 }
 
 .forum-item small {
-    color: #999;
+    color: #4b6984;
+    line-height: 2;
 }
 
 .forum-item .forum-sub-title {
-    color: #999;
+    color: #4b6984;
 }
 
 .forum-title {
@@ -106,7 +121,7 @@ body {
 }
 
 .forum-desc {
-    color: #999;
+    color: #254068;
 }
 
 .forum-icon {
@@ -239,8 +254,4 @@ a.forum-item-title:hover {
 
 .m-b-sm {
     margin-bottom: 10px;
-}
-
-.breadcrumb {
-    margin-bottom: 0rem;
 }
