@@ -1,5 +1,6 @@
 # init.py
 
+import click
 from flask import Flask, render_template
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
@@ -11,6 +12,11 @@ db = SQLAlchemy()
 # Page not found (404) handler
 def page_not_found(e):
     return render_template("404.html"), 404
+
+
+@click.command()
+def hello():
+    click.echo('Hello there')
 
 
 def create_app():
@@ -26,10 +32,9 @@ def create_app():
     db.init_app(app)
 
     # Init CLI commands
-    from . import db_models
-    app.cli.add_command(db_models.init_db)
-    from . import create_demodata
-    app.cli.add_command(create_demodata.demo_data)
+    from .commands import init_db, demo_data
+    app.cli.add_command(init_db)
+    app.cli.add_command(demo_data)
 
     # User session manager and user_id loader
     login_manager = LoginManager()
@@ -51,7 +56,7 @@ def create_app():
         app.register_blueprint(main_blueprint)
 
         # Admin
-        from admin import admin_auth as auth_admin_blueprint
+        from .admin import admin_auth as auth_admin_blueprint
         app.register_blueprint(auth_admin_blueprint, url_prefix = "/admin")
 
         # Authorised user
