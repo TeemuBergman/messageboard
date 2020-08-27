@@ -4,7 +4,9 @@ from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from csrf import validate_csrf_token, set_csrf_token
+
+# From message board
+from .csrf import validate_csrf_token, set_csrf_token
 from .db_models import Users
 from .user_roles import login_required, Role
 from . import db
