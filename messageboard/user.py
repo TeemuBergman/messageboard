@@ -4,7 +4,6 @@ from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
-
 # From message board
 from .csrf import validate_csrf_token, set_csrf_token
 from .db_models import Users
@@ -41,10 +40,10 @@ def login_post():
 
     # Look for the user and check password hash match and redirect if they don"t
     if not user:
-        flash("Wrong username. \n Please try again!")
+        flash("Wrong username. Please try again!")
         return redirect(url_for("user_auth.login"))
     elif not check_password_hash(user.password_hash, password):
-        flash("Wrong password. \n Please try again!")
+        flash("Wrong password. Please try again!")
         return redirect(url_for("user_auth.login"))
     elif user.deleted:
         flash("User account deleted!")
@@ -77,36 +76,47 @@ def signup_post():
     # Get user info from form...
     username = request.form.get("username")
     email = request.form.get("email")
-    password = request.form.get("password")
+    password_1 = request.form.get("password_1")
+    password_2 = request.form.get("password_2")
     # ...and clean it
     username = remove_spaces(username)
     email = remove_spaces(email)
-    password = remove_spaces(password)
+    password_1 = remove_spaces(password_1)
+    password_2 = remove_spaces(password_2)
 
-    # Check if sign up has too many characters
-    if len(username) > 100 or len(username) == 0:
+    # Check if sign up is correct
+    if password_1 != password_2:
+        flash("Passwords do not match. Please try again!")
         return redirect(request.referrer)
-    if len(email) > 5000 or len(email) == 0:
+    elif len(username) > 100 or len(username) == 0:
+        flash("Username too long or short. Please try again!")
         return redirect(request.referrer)
-    if len(password) > 5000 or len(password) == 0:
+    elif len(email) > 128 or len(email) == 0:
+        flash("Email too long. Please try again!")
+        return redirect(request.referrer)
+    elif len(password_1) > 64 or len(password_1) == 0:
+        flash("Wrong password. Please try again!")
         return redirect(request.referrer)
 
     # Check for email address already in database
-    user = Users.query.filter_by(email = email).first()
+    email_db = Users.query.filter_by(email = email).first()
+    username_db = Users.query.filter_by(username = username).first()
 
-    if user:
+    if email_db:
         flash("User with this email already exists.\n Please try again!")
         return redirect(url_for("user_auth.signup"))
+    elif username_db:
+        pass
 
     # Create new user data and add it to the database
     current_time = datetime.now()
     sql = """
-        INSERT INTO users (username, email, password_hash, account_created, last_login)
-        VALUES (:username, :email, :password_hash, :account_created, :last_login);
+        INSERT INTO users (user_role, username, email, password_hash, account_created, last_login)
+        VALUES ('USER', :username, :email, :password_hash, :account_created, :last_login);
     """
     db.session.execute(sql, {"username": username,
                              "email": email,
-                             "password_hash": generate_password_hash(password, method = "sha256"),
+                             "password_hash": generate_password_hash(password_1, method = "sha256"),
                              "account_created": current_time,
                              "last_login": current_time})
     db.session.commit()
