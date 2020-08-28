@@ -4,28 +4,38 @@
 	<nav aria-label="breadcrumb">
 		<ol class="breadcrumb">
 			<li class="breadcrumb-item"><a href="/">Home</a></li>
-			<li class="breadcrumb-item active" aria-current="page">{{ category_info.category_name }}</li>
+			{% if threads.rowcount %}
+				<li class="breadcrumb-item active" aria-current="page">{{ category_info.category_name }}</li>
+			{% endif %}
 		</ol>
 	</nav>
 {% endblock %}
 
 {% block content %}
 	<div class="ibox-content forum-container">
-		<!-- Header for threads -->
 		<div class="row">
 			<div class="col-md-6">
-				<h3>{{ category_info.category_name }}</h3>
+				{% if threads.rowcount %}
+					<!-- Header for threads -->
+					<h3>{{ category_info.category_name }}</h3>
+					<p class="forum-desc">
+						Threads: <b>{{ sum_threads }}</b> &thinsp;
+						Messages: <b>{{ sum_messages }}</b> &thinsp;
+					</p>
+				{% endif %}
 			</div>
 			<div class="col-md-6">
 				{% if current_user.is_authenticated %}
+					<!-- New thread button -->
 					<form action="/board/{{ category_info.category_id }}/createthread">
 						<button type="submit" class="btn btn-primary float-right">Create a new thread!</button>
 					</form>
 				{% endif %}
 			</div>
+
 		</div>
-		<!-- List all threads -->
 		{% if threads.rowcount %}
+			<!-- List all threads -->
 			{% for row in threads %}
 				<div class="forum-item position-relative">
 					<!-- Thread name and message count -->
@@ -60,11 +70,10 @@
 			{% endfor %}
 		{% else %}
 			<!-- Show if there are no threads -->
-			<div class="forum-item position-relative">
+			<div class="forum-item">
 				<div class="row">
 					<div class="col-md-12">
-						<br>
-						<p class="text-center">No threads here, please create one!</p>
+						<p class="text-center">No threads here!</p>
 					</div>
 				</div>
 			</div>

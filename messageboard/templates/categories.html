@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
 {% block breadcrumb %}
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item active" aria-current="page">Home</li>
-        </ol>
-    </nav>
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item active" aria-current="page">Home</li>
+		</ol>
+	</nav>
 {% endblock %}
 
 {% block content %}
@@ -13,14 +13,23 @@
 
 		<!-- Header for categories -->
 		<div class="row">
-			<div class="col">
+			<div class="col-md-8">
 				{% if current_user.is_authenticated %}
-					<h3>Welcome to Message Board, {{ user.username }}!</h3>
+					<h3>Welcome, {{ user.username }}!</h3>
 				{% else %}
-					<h3>Welcome to Message Board!</h3>
+					<h3>Welcome!</h3>
 				{% endif %}
-				<p class="forum-desc">Total threads: <b>{{ sum_threads }}</b> &thinsp; Messages:
+				<p class="forum-desc">Threads: <b>{{ sum_threads }}</b> &thinsp; Messages:
 					<b>{{ sum_messages }}</b> &thinsp; Users: <b>{{ sum_users }}</b></p>
+			</div>
+			<div class="col-md-4">
+				{% if current_user.user_role|string() == "ADMIN" %}
+					<!-- Admin delete MESSAGE button -->
+					<button type="button" class="btn btn-primary btn-sm float-right"
+							data-toggle="modal" data-target="#admin_create_category">
+						Create new category
+					</button>
+				{% endif %}
 			</div>
 		</div>
 
@@ -41,12 +50,61 @@
 					<div class="col-md-2 text-center">
 						<h5>{{ row.messages_count }}</h5>
 						<div class="forum-sub-title">Messages</div>
-                    </div>
+					</div>
 
-                    <a href="/board/{{ row.category_id }}" class="stretched-link"></a>
-                </div>
-            </div>
-        {% endfor %}
+					<a href="/board/{{ row.category_id }}" class="stretched-link"></a>
+				</div>
+			</div>
+		{% endfor %}
 
-    </div>
+		{% if current_user.user_role|string() == "ADMIN" %}
+			<!-- Create new category -->
+			<div class="modal fade" id="admin_create_category" tabindex="-1" role="dialog"
+				 aria-labelledby="new_category"
+				 aria-hidden="true" data-backdrop="static">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="exampleModalLabel">
+								Create a new category
+							</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<form action="/board/new_category" method="post">
+							<div class="modal-body">
+								<p>Create new category by giving it <b>a name</b> and <b>a short description</b>.</p>
+								<div class="form-group">
+									<label for="category_name">Category name</label>
+									<input id="category_name" type="text" class="form-control"
+										   name="category_name">
+								</div>
+								<div class="form-group">
+									<label for="category_description">Category description</label>
+									<input id="category_description" type="text" class="form-control"
+										   name="category_description">
+								</div>
+								<div class="form-group form-check">
+									<input id="category_secret" type="checkbox" class="form-check-input"
+										   name="category_secret">
+									<label for="category_secret" class="form-check-label">Secret category</label>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+								<button id="delete_message" name="delete_message" type="submit"
+										class="btn btn-danger pull-left">
+									Create new thread
+								</button>
+								<button type="button" class="btn btn-secondary ml-auto" data-dismiss="modal">
+									Cancel
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+	</div>
 {% endblock %}
