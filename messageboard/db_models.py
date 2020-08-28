@@ -43,7 +43,6 @@ class Categories(db.Model):
 class Threads(db.Model):
     __tablename__ = "threads"
     thread_id = db.Column(db.Integer, primary_key = True)
-    thread_visible = db.Column(db.Boolean, nullable = False, default = True)
     thread_name = db.Column(db.String(256), nullable = False)
     thread_created = db.Column(db.DateTime, nullable = False)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.category_id"))
