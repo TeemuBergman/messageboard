@@ -44,6 +44,8 @@ def login_post():
     # Get current user object
     user = Users.query.filter(Users.username.ilike(username)).first()
 
+    print(user.user_role)
+
     # Look for the user and check password hash match and redirect if they don"t
     if not user:
         flash("Wrong username. Please try again!", "alert-danger")
@@ -51,7 +53,7 @@ def login_post():
     elif not check_password_hash(user.password_hash, password):
         flash("Wrong password. Please try again!", "alert-danger")
         return redirect(url_for("user_auth.login"))
-    elif user.deleted:
+    elif user.user_role == "DELETED":
         flash("User account deleted!", "alert-danger")
         return redirect(url_for("user_auth.login"))
 
@@ -143,9 +145,10 @@ def signup_post():
 
 
 # User logout
-@user_auth.route("/Logout")
-@login_required(Role.USER)
+@user_auth.route("/logout")
+@login_required(Role.DELETED)
 def logout():
+    # Log out
     logout_user()
 
     # Message for logged out
@@ -161,66 +164,123 @@ def logout():
 @user_auth.route("/profile", methods = ["GET", "POST"])
 @login_required(Role.USER)
 def profile():
-    if request.method == "GET":
-        return render_template(
-            "profile.html",
-            username = current_user.username,
-            email = current_user.email,
-            banned = current_user.banned,
-            ban_duration = current_user.ban_duration,
-            registered = current_user.account_created,
-            last_login = current_user.last_login,
-            confirmation = False
-        )
+    # Set token
+    set_csrf_token()
 
-    if request.method == "POST":
+    # Get and show alert messages (for successful registration)
+    alert_message = request.args.get('alert_message')
+    alert_type = request.args.get('alert_type')
+    if alert_message:
+        flash(alert_message, alert_type)
 
-        if "delete_profile" in request.form:
-            # Change deleted value to True
-            sql = """
-                  UPDATE users
-                  SET deleted = true
-                  WHERE user_id = :user_id;
-                  """
-            db.session.execute(sql, {"user_id": current_user.user_id})
-            db.session.commit()
+    return render_template(
+        "profile.html",
+        username = current_user.username,
+        email = current_user.email,
+        user_role = current_user.user_role,
+        ban_duration = current_user.ban_duration,
+        registered = current_user.account_created,
+        last_login = current_user.last_login,
+        confirmation = False
+    )
 
-            # Log out user
-            return redirect(url_for("user_auth.logout"))
 
-        if "edit_profile" in request.form:
-            # Check that the old password is valid
-            password = request.form["password"]
-            if password == "" or not check_password_hash(current_user.password_hash, password):
-                pass
-            else:
-                # Check that email is valid
-                email = request.form["email_1"]
-                email_2 = request.form["email_2"]
-                if email == "" or email != email_2:
-                    email = current_user.email
+# Route where logged user can view and edit its info
+@user_auth.route("/profile/edit_email", methods = ["POST"])
+@login_required(Role.USER)
+def edit_email():
+    # Validate token
+    validate_csrf_token()
 
-                # Check that password is valid
-                new_password_1 = request.form["new_password_1"]
-                new_password_2 = request.form["new_password_2"]
-                if new_password_1 == "" or new_password_1 != new_password_2:
-                    password = current_user.password_hash
-                else:
-                    password = generate_password_hash(new_password_1, method = "sha256")
+    # Check that the old password is valid
+    password = request.form["password"]
+    if password == "" or not check_password_hash(current_user.password_hash, password):
+        return redirect(request.referrer)
 
-                # Update new user profile to DB
-                sql = """
-                      UPDATE users
-                      SET email = :email, password_hash = :password
-                      WHERE user_id = :user_id;
-                      """
-                db.session.execute(sql, {"email": email,
-                                         "password": password,
-                                         "user_id": current_user.user_id})
-                db.session.commit()
+    # Check that new email is valid
+    email = request.form["email_1"]
+    email_2 = request.form["email_2"]
+    if email == "" or email != email_2:
+        email = current_user.email
 
-            # Refresh profile page
-            return redirect(request.referrer)
+    # Update new user profile to DB
+    sql = """
+        UPDATE users
+        SET email = :email
+        WHERE user_id = :user_id;
+    """
+    db.session.execute(sql, {"email": email,
+                             "user_id": current_user.user_id})
+    db.session.commit()
+
+    # Message for logged out
+    alert_message = "New email saved!"
+    alert_type = "alert-success"
+
+    # Refresh profile page
+    return redirect(url_for("user_auth.profile",
+                            alert_message = alert_message,
+                            alert_type = alert_type))
+
+
+# Route where logged user can view and edit its info
+@user_auth.route("/profile/edit_password", methods = ["POST"])
+@login_required(Role.USER)
+def edit_password():
+    # Validate token
+    validate_csrf_token()
+
+    # Check that the old password is valid
+    password = request.form["password"]
+    if password == "" or not check_password_hash(current_user.password_hash, password):
+        return redirect(request.referrer)
+
+    # Check that password is valid
+    new_password_1 = request.form["new_password_1"]
+    new_password_2 = request.form["new_password_2"]
+    if new_password_1 == "" or new_password_1 != new_password_2:
+        password = current_user.password_hash
+    else:
+        password = generate_password_hash(new_password_1, method = "sha256")
+
+    # Update new user profile to DB
+    sql = """
+        UPDATE users
+        SET password_hash = :password
+        WHERE user_id = :user_id;
+    """
+    db.session.execute(sql, {"password": password,
+                             "user_id": current_user.user_id})
+    db.session.commit()
+
+    # Message for logged out
+    alert_message = "New password saved!"
+    alert_type = "alert-success"
+
+    # Refresh profile page
+    return redirect(url_for("user_auth.profile",
+                            alert_message = alert_message,
+                            alert_type = alert_type))
+
+
+# Delete user
+@user_auth.route("/profile/delete_user", methods = ["POST"])
+@login_required(Role.USER)
+def delete_user():
+    # Validate token
+    validate_csrf_token()
+
+    # Change deleted value to True
+    sql = """
+          UPDATE users
+          SET user_role = 'DELETED'
+          WHERE user_id = :user_id;
+          """
+    db.session.execute(sql, {"user_id": current_user.user_id})
+    db.session.commit()
+
+    # Log out user
+    return redirect(url_for("user_auth.logout"))
 
 
 '''
