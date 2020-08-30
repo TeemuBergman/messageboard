@@ -10,10 +10,21 @@
 
 {% block content %}
 	<div class="ibox-content forum-container">
-
-		<!-- Header for categories -->
 		<div class="row">
-			<div class="col-md-8">
+			<!-- Alert messages -->
+			<div class="col-md-12">
+				{% with messages = get_flashed_messages(with_categories=true) %}
+					{% if messages %}
+						{% for category, message in messages %}
+							<div class="alert {{ category }}" role="alert">
+								{{ message }}
+							</div>
+						{% endfor %}
+					{% endif %}
+				{% endwith %}
+			</div>
+			<div class="col-md-9">
+				<!-- Message Board main header -->
 				{% if current_user.is_authenticated %}
 					<h3>Welcome, {{ user.username }}!</h3>
 				{% else %}
@@ -22,10 +33,10 @@
 				<p class="forum-desc">Threads: <b>{{ sum_threads }}</b> &thinsp; Messages:
 					<b>{{ sum_messages }}</b> &thinsp; Users: <b>{{ sum_users }}</b></p>
 			</div>
-			<div class="col-md-4">
+			<div class="col-md-3 text-right">
 				{% if current_user.user_role|string() == "ADMIN" %}
 					<!-- Admin delete MESSAGE button -->
-					<button type="button" class="btn btn-primary btn-sm float-right"
+					<button type="button" class="btn btn-outline-danger btn-sm"
 							data-toggle="modal" data-target="#admin_create_category">
 						Create new category
 					</button>
