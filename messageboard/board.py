@@ -442,6 +442,7 @@ def list_messages(category_id, thread_id):
             m.message_content,
             m.message_created,
             m.message_edited,
+            m.message_deleted,
             u.user_id,
             u.username,
             u.user_role
@@ -594,7 +595,8 @@ def admin_delete_message(category_id, thread_id):
         UPDATE messages
         SET
             message_content = '*** Message deleted by administrator ***',
-            message_edited = :current_time
+            message_edited = :current_time,
+            message_deleted = 'True'
         WHERE message_id = :message_id;
     """
 
