@@ -35,8 +35,7 @@ admin = Users(
     email = "admin@messageboard.com",
     user_role = "ADMIN",
     account_created = datetime.now(),
-    last_login = datetime.now(),
-    view_secret = True
+    last_login = datetime.now()
 )
 
 # PW: johndoe
