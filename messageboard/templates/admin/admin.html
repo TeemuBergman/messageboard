@@ -2,6 +2,21 @@
 
 {% block content %}
 	<div class="ibox-content forum-container">
+		<!-- Alert messages -->
+		<div class="row">
+			<div class="col-md-12">
+				{% with messages = get_flashed_messages(with_categories=true) %}
+					{% if messages %}
+						{% for category, message in messages %}
+							<div class="alert {{ category }}" role="alert">
+								{{ message }}
+							</div>
+						{% endfor %}
+					{% endif %}
+				{% endwith %}
+			</div>
+		</div>
+
 		<!-- Header for user control panel -->
 		<div class="row">
 			<div class="col-md-12">
@@ -37,17 +52,30 @@
 				<div class="row">
 					<div class="col-md-2"><b>User role</b></div>
 					<div class="col-md-10">
-						<form action="/admin" method="post">
+						<form action="/admin/" method="post">
 							<label for="user_role_select"></label>
 							<select class="form-control-sm" id="user_role_select" name="user_role">
-								<option selected="selected">{{ row.user_role }}</option>
-								<option value="ADMIN">ADMIN</option>
-								<option value="SECRET">SECRET</option>
-								<option value="USER">USER</option>
-								<option value="BANNED">BANNED</option>
-								<option value="DELETED">DELETED</option>
+								<option value="ADMIN" {% if row.user_role == "ADMIN" %}selected{% endif %}>
+									ADMIN
+								</option>
+								<option value="SECRET" {% if row.user_role == "SECRET" %}selected="selected"{% endif %}>
+									SECRET
+								</option>
+								<option value="USER" {% if row.user_role == "USER" %}selected="selected"{% endif %}>
+									USER
+								</option>
+								<option value="BANNED"
+										{% if row.user_role == "BANNED" %}selected="selected"{% endif %}>
+									BANNED
+								</option>
+								<option value="DELETED"
+										{% if row.user_role == "DELETED" %}selected="selected"{% endif %}>
+									DELETED
+								</option>
 							</select>
+
 							<input type="hidden" name="user_id" value="{{ row.user_id }}">
+							<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 							<button type="submit" class="btn btn-primary btn-sm float-right"
 									name="save_changes" value="{{ row.user_id }}">
 								Save changes
