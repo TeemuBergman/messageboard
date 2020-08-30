@@ -97,7 +97,7 @@
 									<small>(Banned user)</small>
 								{% endif %}
 							</p>
-							{% if row.user_id == current_user.user_id and not thread_info.thread_locked %}
+							{% if row.user_id == current_user.user_id and not thread_info.thread_locked and not row.message_deleted %}
 								<!-- Delete or edit message -->
 								<form method="post">
 									<button type="button" class="btn btn-sm btn-primary"
