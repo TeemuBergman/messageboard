@@ -1,8 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="ibox-content forum-container">
-        <div class="row">
+	<div class="ibox-content forum-container">
+		<div class="row">
+
+			<!-- Alert messages -->
+			<div class="col-md-12">
+				{% with messages = get_flashed_messages(with_categories=true) %}
+					{% if messages %}
+						{% for category, message in messages %}
+							<div class="alert {{ category }}" role="alert">
+								{{ message }}
+							</div>
+						{% endfor %}
+					{% endif %}
+				{% endwith %}
+			</div>
 
 			<!-- Header for profile page -->
 			<div class="col-md-12">
@@ -100,7 +113,7 @@
 						<div class="modal-body">
 							<p>Change your current email address by entering a new address
 								below and confirm it by entering your <b>current password</b>.</p>
-							<form action="/profile" method="POST">
+							<form action="/profile/edit_email" method="POST">
 								<div class="form-group">
 									<label for="email_1">New email</label>
 									<input name="email_1" class="form-control" type="email" value="">
@@ -111,6 +124,7 @@
 										Enter your current password to save changes</label>
 									<input name="password" class="form-control" type="password" value="">
 								</div>
+								<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 								<button type="submit" class="btn btn-primary float-left" name="edit_profile">
 									Save edits
 								</button>
@@ -143,7 +157,7 @@
 							<p>Change your current password by entering a new password
 								below and confirm it by entering your <b>current password</b>
 								or press cancel to exit edit mode.</p>
-							<form action="/profile" method="POST">
+							<form action="/profile/edit_password" method="POST">
 								<div class="form-group">
 									<label for="new_password_1">New password</label>
 									<input name="new_password_1" class="form-control" type="password" value="">
@@ -154,6 +168,7 @@
 										Enter your current password to save changes</label>
 									<input name="password" class="form-control" type="password" value="">
 								</div>
+								<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 								<button type="submit" class="btn btn-primary float-left" name="edit_profile">
 									Save edits
 								</button>
@@ -181,29 +196,30 @@
 							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 								<span aria-hidden="true">&times;</span>
 							</button>
-                        </div>
-                        <div class="modal-body">
-                            <p>
-                                Do you really want to delete your profile?
-                                Your old messages will be left untouched.
-                                <b>This action cannot be undone!</b>
-                            </p>
-                        </div>
-                        <div class="modal-footer">
-                            <form action="/profile" method="post">
-                                <button type="submit" class="btn btn-danger float-left" name="delete_profile">
-                                    DELETE PROFILE
-                                </button>
-                            </form>
-                            <button type="button" class="btn btn-secondary ml-auto" data-dismiss="modal">
-                                CANCEL
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+						</div>
+						<div class="modal-body">
+							<p>
+								Do you really want to delete your profile?
+								Your old messages will be left untouched.
+								<b>This action cannot be undone!</b>
+							</p>
+						</div>
+						<div class="modal-footer">
+							<form action="/profile/delete_user" method="post">
+								<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+								<button type="submit" class="btn btn-danger float-left" name="delete_profile">
+									DELETE PROFILE
+								</button>
+							</form>
+							<button type="button" class="btn btn-secondary ml-auto" data-dismiss="modal">
+								CANCEL
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
 
-        </div>
-    </div>
+		</div>
+	</div>
 
 {% endblock %}
