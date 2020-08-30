@@ -1,9 +1,9 @@
 # board.py
 
 from datetime import datetime
-from flask import Blueprint, render_template, redirect, url_for, request
+from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import current_user
-# From message board
+# From message board app
 from .user_roles import login_required, Role, check_secret
 from .csrf import set_csrf_token, validate_csrf_token
 from . import db
@@ -54,6 +54,12 @@ def index():
     # Set token
     set_csrf_token()
 
+    # Get and show alert messages (for successful registration)
+    alert_message = request.args.get('alert_message')
+    alert_type = request.args.get('alert_type')
+    if alert_message:
+        flash(alert_message, alert_type)
+
     # Check if user can view secret categories
     view_secret = check_secret()
 
@@ -89,7 +95,7 @@ def index():
         FROM messages AS m
         JOIN threads t ON m.thread_id = t.thread_id
         JOIN categories AS c ON t.category_id = c.category_id
-        WHERE c.category_secret IN (false, :category_secret);;
+        WHERE c.category_secret IN (false, :category_secret);
     """
     sum_messages = db.session.execute(sql, {"category_secret": view_secret}).first()[0]
 
@@ -109,10 +115,15 @@ def index():
                            user = current_user)
 
 
+'''
+    Category functions
+'''
+
+
 # New category (ADMIN)
 @board.route("/new_category", methods = ["GET", "POST"])
 @login_required(Role.ADMIN)
-def index_new_category():
+def admin_new_category():
     # Validate token
     validate_csrf_token()
 
@@ -146,13 +157,103 @@ def index_new_category():
     return redirect(request.referrer)
 
 
+# Edit category (ADMIN)
+@board.route("/<int:category_id>/admin_edit_category", methods = ["GET", "POST"])
+@login_required(Role.ADMIN)
+def admin_edit_category(category_id):
+    # Validate token
+    validate_csrf_token()
+
+    # Get content from form...
+    category_name = request.form["category_name"]
+    category_description = request.form["category_description"]
+    category_secret = request.form.get("category_secret")
+    # ...and clean it
+    category_name = remove_spaces(category_name)
+    category_description = remove_spaces(category_description)
+
+    if not category_secret:
+        category_secret = "False"
+
+    # Edit category
+    sql = """
+        UPDATE categories
+        SET
+            category_name = :category_name,
+            category_description = :category_description,
+            category_secret = :category_secret
+        WHERE category_id = :category_id;
+    """
+    db.session.execute(sql, {
+        "category_name": category_name,
+        "category_description": category_description,
+        "category_secret": category_secret,
+        "category_id": category_id
+    })
+    db.session.commit()
+
+    return redirect(request.referrer)
+
+
+# Delete category (ADMIN)
+@board.route("/<int:category_id>/admin_delete_category", methods = ["GET", "POST"])
+@login_required(Role.ADMIN)
+def admin_delete_category(category_id):
+    # Validate token
+    validate_csrf_token()
+
+    # Get thread ID and category ID
+    sql = """
+        SELECT thread_id, category_id
+        FROM threads
+        WHERE category_id = :category_id;
+    """
+    id_list = db.session.execute(sql, {"category_id": category_id})
+
+    # Delete messages and threads
+    for row in id_list:
+        # Delete messages in threads
+        sql = """
+            DELETE 
+            FROM messages
+            WHERE thread_id = :thread_id
+        """
+        db.session.execute(sql, {"thread_id": row.thread_id})
+        db.session.commit()
+
+        # Delete threads in category
+        sql = """
+            DELETE 
+            FROM threads
+            WHERE category_id = :category_id
+        """
+        db.session.execute(sql, {"category_id": row.category_id})
+        db.session.commit()
+
+    # Delete category
+    sql = """
+        DELETE 
+        FROM categories
+        WHERE category_id = :category_id
+    """
+    db.session.execute(sql, {"category_id": category_id})
+    db.session.commit()
+
+    return redirect(url_for("board.index"))
+
+
+'''
+    Thread functions
+'''
+
+
 # List all threads on selected category
 @board.route("/<int:category_id>/")
 def list_threads(category_id):
     # Check if user can view secret categories
     view_secret = check_secret()
 
-    # Get threads, count messages, username, last message and timestamp
+    # Get threads and count messages
     sql = """
         SELECT
             c.category_id,
@@ -161,6 +262,7 @@ def list_threads(category_id):
             t.thread_id,
             t.thread_name,
             t.thread_created,
+            t.thread_locked,
             m1.message_content,
             (SELECT COUNT(m3.message_id) FROM messages AS m3 WHERE m3.thread_id = t.thread_id) AS messages_count,
             m1.message_created,
@@ -215,6 +317,107 @@ def list_threads(category_id):
                            )
 
 
+# Create a new thread
+@board.route("/<int:category_id>/create_new_thread", methods = ["POST"])
+@login_required(Role.USER)
+def create_new_thread(category_id):
+    # Validate token
+    validate_csrf_token()
+    # Get message_content from form
+    thread_name = request.form["thread_name"]
+    message_content = request.form["message_content"]
+    # ...and clean it
+    thread_name = remove_spaces(thread_name)
+    message_content = remove_spaces(message_content)
+
+    # Check if reply has too many characters
+    if len(thread_name) > 100 or len(thread_name) == 0:
+        return redirect(request.referrer)
+    if len(message_content) > 5000 or len(message_content) == 0:
+        return redirect(request.referrer)
+
+    # Construct a new thread and first post
+    sql = """
+        WITH new_thread
+        AS (INSERT INTO threads (thread_name, category_id, thread_created, thread_locked)
+        VALUES (:thread_name, :category_id, :thread_created, 'False')
+        RETURNING thread_id)
+        INSERT INTO messages (message_content, thread_id, user_id, message_created)
+        VALUES (:message_content, (SELECT thread_id FROM new_thread), :user_id, :message_created);
+    """
+
+    current_time = datetime.now()
+
+    db.session.execute(sql, {
+        "thread_name": thread_name,
+        "category_id": category_id,
+        "thread_created": current_time,
+        "message_content": message_content,
+        "user_id": current_user.user_id,
+        "message_created": current_time
+    })
+    db.session.commit()
+
+    return redirect(request.referrer)
+
+
+# Lock selected thread (ADMIN)
+@board.route("/<int:category_id>/<int:thread_id>/admin_lock_thread", methods = ["POST"])
+@login_required(Role.ADMIN)
+def admin_lock_thread(category_id, thread_id):
+    # Validate token
+    validate_csrf_token()
+
+    sql = """
+        SELECT thread_locked
+        FROM threads
+        WHERE thread_id = :thread_id;
+    """
+    thread_locked = db.session.execute(sql, {"thread_id": thread_id}).first()[0]
+
+    sql = """
+        UPDATE threads
+        SET thread_locked = :thread_locked
+        WHERE thread_id = :thread_id;
+    """
+    db.session.execute(sql, {
+        "thread_locked": not thread_locked,
+        "thread_id": thread_id
+    })
+    db.session.commit()
+
+    return redirect(request.referrer)
+
+
+# Delete selected thread (ADMIN)
+@board.route("/<int:category_id>/<int:thread_id>/admin_delete_thread", methods = ["POST"])
+@login_required(Role.ADMIN)
+def admin_delete_thread(category_id, thread_id):
+    # Validate token
+    validate_csrf_token()
+
+    # Delete all messages in thread
+    sql = """
+        DELETE
+        FROM messages
+        WHERE thread_id = :thread_id;
+    """
+    db.session.execute(sql, {"thread_id": thread_id})
+    db.session.commit()
+
+    # Delete the corresponding thread
+    sql = """
+        DELETE
+        FROM threads
+        WHERE thread_id = :thread_id;
+    """
+    db.session.execute(sql, {"thread_id": thread_id})
+    db.session.commit()
+
+    return redirect(url_for("board.list_threads",
+                            category_id = category_id))
+
+
 '''
     Message functions
 '''
@@ -234,6 +437,7 @@ def list_messages(category_id, thread_id):
         SELECT
             t.thread_id,
             t.thread_name,
+            t.thread_locked,
             m.message_id,
             m.message_content,
             m.message_created,
@@ -265,7 +469,7 @@ def list_messages(category_id, thread_id):
                            )
 
 
-# Post a new reply to a thread
+# Post a new reply
 @board.route("/<int:category_id>/<int:thread_id>/", methods = ["POST"])
 @login_required(Role.USER)
 def post_reply(category_id, thread_id):
@@ -375,7 +579,7 @@ def delete_message(category_id, thread_id):
         return redirect(request.referrer)
 
 
-# Delete selected message
+# Delete selected message (ADMIN)
 @board.route("/<int:category_id>/<int:thread_id>/admin_delete_message", methods = ["POST"])
 @login_required(Role.ADMIN)
 def admin_delete_message(category_id, thread_id):
@@ -402,94 +606,6 @@ def admin_delete_message(category_id, thread_id):
     db.session.commit()
 
     return redirect(request.referrer)
-
-
-# Delete selected message
-@board.route("/<int:category_id>/<int:thread_id>/admin_delete_thread", methods = ["POST"])
-@login_required(Role.ADMIN)
-def admin_delete_thread(category_id, thread_id):
-    # Validate token
-    validate_csrf_token()
-
-    # Delete all messages in thread
-    sql = """
-        DELETE
-        FROM messages
-        WHERE thread_id = :thread_id;
-    """
-    db.session.execute(sql, {"thread_id": thread_id})
-    db.session.commit()
-
-    # Delete the corresponding thread
-    sql = """
-        DELETE
-        FROM threads
-        WHERE thread_id = :thread_id;
-    """
-    db.session.execute(sql, {"thread_id": thread_id})
-    db.session.commit()
-
-    return list_threads(category_id)
-
-
-'''
-    Create new thread
-'''
-
-
-# Create a new thread
-@board.route("/<int:category_id>/createthread")
-@login_required(Role.USER)
-def new_thread(category_id):
-    # Set token
-    set_csrf_token()
-    return render_template("new_thread.html",
-                           category_id = category_id)
-
-
-# Send new thread to database
-@board.route("/<int:category_id>/createthread", methods = ["POST"])
-@login_required(Role.USER)
-def new_thread_post(category_id):
-    # Validate token
-    validate_csrf_token()
-
-    # Get content from form
-    thread_name = request.form["thread_name"]
-    content = request.form["content"]
-    # ...and clean it
-    thread_name = remove_spaces(thread_name)
-    content = remove_spaces(content)
-
-    # Check if reply has too many characters
-    if len(thread_name) > 100 or len(thread_name) == 0:
-        return redirect(request.referrer)
-    if len(content) > 5000 or len(content) == 0:
-        return redirect(request.referrer)
-
-    # Construct a new thread and first post
-    current_time = datetime.now()
-    sql = """
-        WITH new_thread
-        AS (INSERT INTO threads (thread_name, category_id, thread_created)
-        VALUES (:thread_name, :category_id, :thread_created)
-        RETURNING thread_id)
-        INSERT INTO messages (message_content, thread_id, user_id, message_created)
-        VALUES (:message_content, (SELECT thread_id FROM new_thread), :user_id, :message_created);
-    """
-
-    db.session.execute(sql, {
-        "thread_name": thread_name,
-        "category_id": category_id,
-        "thread_created": current_time,
-        "message_content": content,
-        "user_id": current_user.user_id,
-        "message_created": current_time
-    })
-    db.session.commit()
-
-    return redirect(url_for("board.list_threads",
-                            category_id = category_id))
 
 
 '''
