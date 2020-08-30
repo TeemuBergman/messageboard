@@ -52,5 +52,6 @@ class Messages(db.Model):
     message_content = db.Column(db.String, nullable = False)
     message_created = db.Column(db.DateTime, nullable = False)
     message_edited = db.Column(db.DateTime)
+    message_deleted = db.Column(db.Boolean, default = False)
     thread_id = db.Column(db.Integer, db.ForeignKey("threads.thread_id"))
     user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))
