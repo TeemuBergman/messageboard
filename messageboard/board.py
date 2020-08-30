@@ -444,7 +444,7 @@ def list_messages(category_id, thread_id):
             m.message_edited,
             u.user_id,
             u.username,
-            u.deleted
+            u.user_role
         FROM messages m
         JOIN users AS u ON u.user_id = m.user_id
         JOIN threads AS t ON t.thread_id = m.thread_id
