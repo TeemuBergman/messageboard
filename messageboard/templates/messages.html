@@ -16,6 +16,20 @@
 
 {% block content %}
 	<div class="ibox-content forum-container">
+		<!-- Alert messages -->
+		<div class="row">
+			<div class="col-md-12">
+				{% with messages = get_flashed_messages(with_categories=true) %}
+					{% if messages %}
+						{% for category, message in messages %}
+							<div class="alert {{ category }}" role="alert">
+								{{ message }}
+							</div>
+						{% endfor %}
+					{% endif %}
+				{% endwith %}
+			</div>
+		</div>
 		{% if thread_info.thread_locked %}
 			<!-- In case of error -->
 			<div class="alert alert-danger" role="alert">
