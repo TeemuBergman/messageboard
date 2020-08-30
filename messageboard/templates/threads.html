@@ -104,7 +104,7 @@
 		{% endif %}
 	</div>
 
-	{% if current_user.is_authenticated and (category_info.category_secret and viewable) %}
+	{% if current_user.is_authenticated %}
 		<!-- Create NEW thread -->
 		<div class="modal fade" id="new_thread" tabindex="-1" role="dialog"
 			 aria-labelledby="new_category"
