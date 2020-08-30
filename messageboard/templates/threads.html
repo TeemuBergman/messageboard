@@ -14,22 +14,39 @@
 {% block content %}
 	<div class="ibox-content forum-container">
 		<div class="row">
-			<div class="col-md-6">
+			{% if current_user.user_role|string() == "ADMIN" %}
+				<div class="col-md-12">
+					<!-- Admin DELETE category button -->
+					<button type="submit" class="btn btn-sm btn-outline-danger" data-toggle="modal"
+							data-target="#admin_delete_category">
+						Delete category
+					</button>
+					<!-- Admin EDIT category button -->
+					<button type="submit" class="btn btn-sm btn-outline-danger" data-toggle="modal"
+							data-target="#admin_edit_category">
+						Edit category
+					</button>
+					<hr/>
+				</div>
+			{% endif %}
+			<div class="col-md-9">
 				{% if threads.rowcount %}
 					<!-- Header for threads -->
 					<h3>{{ category_info.category_name }}</h3>
-					<p class="forum-desc">
-						Threads: <b>{{ sum_threads }}</b> &thinsp;
-						Messages: <b>{{ sum_messages }}</b> &thinsp;
-					</p>
+					{{ category_info.category_description }}
+					<br/>
+					<small class="forum-desc">
+						Threads: <b>{{ sum_threads }}</b> &thinsp; Messages: <b>{{ sum_messages }}</b>
+					</small>
 				{% endif %}
 			</div>
-			<div class="col-md-6">
+			<div class="col-md-3 text-right">
 				{% if current_user.is_authenticated %}
 					<!-- New thread button -->
-					<form action="/board/{{ category_info.category_id }}/createthread">
-						<button type="submit" class="btn btn-primary float-right">Create a new thread!</button>
-					</form>
+					<button type="submit" class="btn btn-sm btn-primary" data-toggle="modal"
+							data-target="#new_thread">
+						Create a new thread
+					</button>
 				{% endif %}
 			</div>
 
@@ -46,7 +63,13 @@
 					</div>
 					<div class="row">
 						<div class="col-md-10">
-							<h5 class="text-primary text-truncate">{{ row.thread_name }}</h5>
+							<h5 class="text-primary text-truncate">
+								{% if not row.thread_locked %}
+									{{ row.thread_name }}
+								{% else %}
+									{{ row.thread_name }} (LOCKED)
+								{% endif %}
+							</h5>
 						</div>
 						<div class="col-md-2 text-center">
 							<h5>{{ row.messages_count }}</h5>
@@ -67,6 +90,7 @@
 						<a href="/board/{{ row.category_id }}/{{ row.thread_id }}" class="stretched-link"></a>
 					</div>
 				</div>
+
 			{% endfor %}
 		{% else %}
 			<!-- Show if there are no threads -->
@@ -79,4 +103,134 @@
 			</div>
 		{% endif %}
 	</div>
+
+	{% if current_user.is_authenticated %}
+		<!-- Create NEW thread -->
+		<div class="modal fade" id="new_thread" tabindex="-1" role="dialog"
+			 aria-labelledby="new_category"
+			 aria-hidden="true" data-backdrop="static">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">
+							Create a new thread
+						</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<form action="/board/{{ category_info.category_id }}/create_new_thread" method="post">
+						<div class="modal-body">
+							<p>Create new thread by giving it a title and first message content.</p>
+							<div class="form-group">
+								<label for="thread_name">Thread title</label>
+								<input id="thread_name" type="text" class="form-control"
+									   name="thread_name">
+							</div>
+							<div class="form-group">
+								<label for="message_content">First message content</label>
+								<textarea id="message_content" type="text" class="form-control"
+										  name="message_content" rows="3" maxlength="5000"></textarea>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+							<button id="delete_message" name="delete_message" type="submit"
+									class="btn btn-primary pull-left">
+								Create a new thread
+							</button>
+							<button type="button" class="btn btn-secondary ml-auto" data-dismiss="modal">
+								Cancel
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+
+	{% if current_user.user_role|string() == "ADMIN" %}
+		<!-- Admin DELETE category -->
+		<div class="modal fade" id="admin_delete_category" tabindex="-1" role="dialog"
+			 aria-labelledby="new_category"
+			 aria-hidden="true" data-backdrop="static">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">
+							Delete category and its contents
+						</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<form action="/board/{{ category_info.category_id }}/admin_delete_category" method="post">
+						<div class="modal-body">
+							<p>You are <b>deleting the category and every thread and message in it</b>, please confirm.
+							</p>
+							<b class="text-danger">THIS OPERATION IS PERMANENT</b>
+						</div>
+						<div class="modal-footer">
+							<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+							<button id="delete_message" name="delete_message" type="submit"
+									class="btn btn-danger pull-left">
+								DELETE CATEGORY
+							</button>
+							<button type="button" class="btn btn-secondary ml-auto" data-dismiss="modal">
+								Cancel
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<!-- Admin EDIT category -->
+		<div class="modal fade" id="admin_edit_category" tabindex="-1" role="dialog"
+			 aria-labelledby="new_category"
+			 aria-hidden="true" data-backdrop="static">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">
+							Edit category
+						</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<form action="/board/{{ category_info.category_id }}/admin_edit_category" method="post">
+						<div class="modal-body">
+							<p>Edit category <b>name</b> and/or <b>short description</b>.</p>
+							<div class="form-group">
+								<label for="category_name">Category name</label>
+								<input id="category_name" type="text" class="form-control"
+									   name="category_name" value="{{ category_info.category_name }}">
+							</div>
+							<div class="form-group">
+								<label for="category_description">Category description</label>
+								<input id="category_description" type="text" class="form-control"
+									   name="category_description" value="{{ category_info.category_description }}">
+							</div>
+							<div class="form-group form-check">
+								<input id="category_secret" type="checkbox" class="form-check-input"
+									   name="category_secret" {% if category_info.category_secret %}checked{% endif %}>
+								<label for="category_secret" class="form-check-label">Secret category</label>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+							<button id="delete_message" name="delete_message" type="submit"
+									class="btn btn-danger pull-left">
+								Save edits
+							</button>
+							<button type="button" class="btn btn-secondary ml-auto" data-dismiss="modal">
+								Cancel
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	{% endif %}
 {% endblock %}
