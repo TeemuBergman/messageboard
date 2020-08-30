@@ -3,22 +3,24 @@
 {% block content %}
 	<div class="ibox-content forum-container">
 		<div class="row">
-
+			<!-- Alert messages -->
 			<div class="col-md-12">
-				<h3 class="title">Sign up</h3>
-				{% with messages = get_flashed_messages() %}
+				{% with messages = get_flashed_messages(with_categories=true) %}
 					{% if messages %}
-						<!-- In case of error -->
-						<div class="alert alert-danger" role="alert">
-							<div class="notification is-danger">
-								{{ messages[0] }}
+						{% for category, message in messages %}
+							<div class="alert {{ category }}" role="alert">
+								{{ message }}
 							</div>
-						</div>
+						{% endfor %}
 					{% endif %}
 				{% endwith %}
+			</div>
+			<!-- Header -->
+			<div class="col-md-12">
+				<h3 class="title">Sign up</h3>
 				<hr>
 			</div>
-
+			<!-- Sign up form -->
 			<div class="col-md-8">
 				<form method="POST" action="/signup">
 					<div class="form-group">
@@ -40,7 +42,7 @@
 					<button type="submit" class="btn btn-primary btn-block">Sign up!</button>
 				</form>
 			</div>
-
+			<!-- Info panel on right -->
 			<div class="col-md-4">
 				<div class="card">
 					<div class="card-body">
