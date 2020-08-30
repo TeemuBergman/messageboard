@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
-# From message board
+# From message board app
 from .csrf import validate_csrf_token, set_csrf_token
 from .db_models import Users
 from .user_roles import login_required, Role
@@ -19,10 +19,16 @@ def login():
     # Set token
     set_csrf_token()
 
+    # Get and show alert messages (for successful registration)
+    alert_message = request.args.get('alert_message')
+    alert_type = request.args.get('alert_type')
+    if alert_message:
+        flash(alert_message, alert_type)
+
     return render_template("login.html")
 
 
-@user_auth.route("/login", methods = ["GET", "POST"])
+@user_auth.route("/login", methods = ["POST"])
 def login_post():
     # Validate token
     validate_csrf_token()
@@ -40,13 +46,13 @@ def login_post():
 
     # Look for the user and check password hash match and redirect if they don"t
     if not user:
-        flash("Wrong username. Please try again!")
+        flash("Wrong username. Please try again!", "alert-danger")
         return redirect(url_for("user_auth.login"))
     elif not check_password_hash(user.password_hash, password):
-        flash("Wrong password. Please try again!")
+        flash("Wrong password. Please try again!", "alert-danger")
         return redirect(url_for("user_auth.login"))
     elif user.deleted:
-        flash("User account deleted!")
+        flash("User account deleted!", "alert-danger")
         return redirect(url_for("user_auth.login"))
 
     # Log in user
@@ -62,7 +68,12 @@ def login_post():
                              "user_id": user.user_id})
     db.session.commit()
 
-    return redirect(url_for("main.index"))
+    alert_message = "Logged in successfully!"
+    alert_type = "alert-success"
+
+    return redirect(url_for("board.index",
+                            alert_message = alert_message,
+                            alert_type = alert_type))
 
 
 # User sign up
@@ -86,16 +97,16 @@ def signup_post():
 
     # Check if sign up is correct
     if password_1 != password_2:
-        flash("Passwords do not match. Please try again!")
+        flash("Passwords do not match. Please try again!", "alert-danger")
         return redirect(request.referrer)
     elif len(username) > 100 or len(username) == 0:
-        flash("Username too long or short. Please try again!")
+        flash("Username too long or short. Please try again!", "alert-danger")
         return redirect(request.referrer)
     elif len(email) > 128 or len(email) == 0:
-        flash("Email too long. Please try again!")
+        flash("Email too long. Please try again!", "alert-danger")
         return redirect(request.referrer)
     elif len(password_1) > 64 or len(password_1) == 0:
-        flash("Wrong password. Please try again!")
+        flash("Wrong password. Please try again!", "alert-danger")
         return redirect(request.referrer)
 
     # Check for email address already in database
@@ -103,10 +114,11 @@ def signup_post():
     username_db = Users.query.filter_by(username = username).first()
 
     if email_db:
-        flash("User with this email already exists.\n Please try again!")
+        flash("User with this email already exists.\n Please try again!", "alert-danger")
         return redirect(url_for("user_auth.signup"))
     elif username_db:
-        pass
+        flash("User with this username already exists.\n Please try again!", "alert-danger")
+        return redirect(url_for("user_auth.signup"))
 
     # Create new user data and add it to the database
     current_time = datetime.now()
@@ -121,7 +133,13 @@ def signup_post():
                              "last_login": current_time})
     db.session.commit()
 
-    return redirect(url_for("user_auth.login"))
+    # Message for successful registration
+    alert_message = "Account created successfully, please log in to continue.", "alert-success"
+    alert_type = "alert-success"
+
+    return redirect(url_for("user_auth.login",
+                            alert_message = alert_message,
+                            alert_type = alert_type))
 
 
 # User logout
@@ -129,7 +147,14 @@ def signup_post():
 @login_required(Role.USER)
 def logout():
     logout_user()
-    return redirect(url_for("main.index"))
+
+    # Message for logged out
+    alert_message = "Successfully logged out!"
+    alert_type = "alert-success"
+
+    return redirect(url_for("board.index",
+                            alert_message = alert_message,
+                            alert_type = alert_type))
 
 
 # Route where logged user can view and edit its info
