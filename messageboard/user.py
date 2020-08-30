@@ -162,7 +162,7 @@ def logout():
 
 # Route where logged user can view and edit its info
 @user_auth.route("/profile", methods = ["GET", "POST"])
-@login_required(Role.USER)
+@login_required(Role.BANNED)
 def profile():
     # Set token
     set_csrf_token()
@@ -187,7 +187,7 @@ def profile():
 
 # Route where logged user can view and edit its info
 @user_auth.route("/profile/edit_email", methods = ["POST"])
-@login_required(Role.USER)
+@login_required(Role.BANNED)
 def edit_email():
     # Validate token
     validate_csrf_token()
@@ -225,7 +225,7 @@ def edit_email():
 
 # Route where logged user can view and edit its info
 @user_auth.route("/profile/edit_password", methods = ["POST"])
-@login_required(Role.USER)
+@login_required(Role.BANNED)
 def edit_password():
     # Validate token
     validate_csrf_token()
@@ -265,7 +265,7 @@ def edit_password():
 
 # Delete user
 @user_auth.route("/profile/delete_user", methods = ["POST"])
-@login_required(Role.USER)
+@login_required(Role.BANNED)
 def delete_user():
     # Validate token
     validate_csrf_token()
