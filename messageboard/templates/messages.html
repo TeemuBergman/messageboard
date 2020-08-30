@@ -115,8 +115,7 @@
 									<div class="form-group">
 										<label for="edit_content">Edit message content</label>
 										<textarea class="form-control" id="edit_content" name="edit_content"
-												  rows="5" maxlength="5000"
-												  onchange="count_characters()">{{ row.message_content }}</textarea>
+												  rows="5" maxlength="5000">{{ row.message_content }}</textarea>
 									</div>
 									<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 									<button type="submit" class="btn btn-primary" name="edit_message"
@@ -141,63 +140,64 @@
 					</div>
 				</div>
 			</div>
+			</div>
 		{% endif %}
-		{% if messages.rowcount and current_user.is_authenticated and not thread_info.thread_locked %}
-			<!-- Post a reply to thread -->
-			<form action="/board/{{ category_info.category_id }}/{{ thread_info.thread_id }}/" method="POST">
-				<div class="row">
-					<div class="col-md-12">
-						<h4>Reply to thread</h4>
-						<div class="form-group">
-							<label for="content"></label>
-							<textarea class="form-control" id="content" name="content" rows="5"
-									  maxlength="5000"></textarea>
-						</div>
-					</div>
-					<div class="col-md-6">
-						<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-						<button type="submit" class="btn btn-primary" name="post_reply">Post a reply</button>
-					</div>
-					<div class="col-md-6">
-						<p id="charactersRemaining" class="text-right">0/5000 characters</p>
+	{% if messages.rowcount and current_user.is_authenticated and not thread_info.thread_locked %}
+		<!-- Post a reply to thread -->
+		<form action="/board/{{ category_info.category_id }}/{{ thread_info.thread_id }}/" method="POST">
+			<div class="row">
+				<div class="col-md-12">
+					<h4>Reply to thread</h4>
+					<div class="form-group">
+						<label for="content"></label>
+						<textarea class="form-control" id="content" name="content" rows="5"
+								  maxlength="5000"></textarea>
 					</div>
 				</div>
-			</form>
-			<!-- Delete message confirmation popup -->
-			<div class="modal fade" id="delete_message" tabindex="-1" role="dialog" aria-labelledby="delete_message"
-				 aria-hidden="true" data-backdrop="static">
-				<div class="modal-dialog" role="document">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h5 class="modal-title" id="exampleModalLabel">
-								Delete message
-							</h5>
-							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-								<span aria-hidden="true">&times;</span>
+				<div class="col-md-6">
+					<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+					<button type="submit" class="btn btn-primary" name="post_reply">Post a reply</button>
+				</div>
+				<div class="col-md-6">
+					<p id="charactersRemaining" class="text-right">0/5000 characters</p>
+				</div>
+			</div>
+		</form>
+		<!-- Delete message confirmation popup -->
+		<div class="modal fade" id="delete_message" tabindex="-1" role="dialog" aria-labelledby="delete_message"
+			 aria-hidden="true" data-backdrop="static">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">
+							Delete message
+						</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p>You are deleting your message, please confirm.</p>
+					</div>
+					<div class="modal-footer">
+						<form action="/board/{{ category_info.category_id }}/{{ thread_info.thread_id }}/delete"
+							  method="post">
+							<input id="message_id" name="message_id" type="hidden">
+							<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+							<button id="delete_message" name="delete_message" type="submit"
+									class="btn btn-danger pull-left">
+								DELETE MESSAGE
 							</button>
-						</div>
-						<div class="modal-body">
-							<p>You are deleting your message, please confirm.</p>
-						</div>
-						<div class="modal-footer">
-							<form action="/board/{{ category_info.category_id }}/{{ thread_info.thread_id }}/delete"
-								  method="post">
-								<input id="message_id" name="message_id" type="hidden">
-								<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-								<button id="delete_message" name="delete_message" type="submit"
-										class="btn btn-danger pull-left">
-									DELETE MESSAGE
-								</button>
-							</form>
-							<button type="button" class="btn btn-secondary ml-auto" data-dismiss="modal">
-								CANCEL
-							</button>
-						</div>
+						</form>
+						<button type="button" class="btn btn-secondary ml-auto" data-dismiss="modal">
+							CANCEL
+						</button>
 					</div>
 				</div>
 			</div>
-			</div>
-		{% endif %}
+		</div>
+		</div>
+	{% endif %}
 
 
 	{% if current_user.user_role|string() == "ADMIN" %}
@@ -313,7 +313,7 @@
 	{% endif %}
 
 	<!-- Scripts for message functionality -->
-	<script type="text/javascript" src="/static/js/character-counter.js"></script>
-	<script type="text/javascript" src="/static/js/message_id.js"></script>
-	<script type="text/javascript" src="/static/js/toggle_visibility.js"></script>
+	<script src="/static/js/character-counter.js"></script>
+	<script src="/static/js/message_id.js"></script>
+	<script src="/static/js/toggle_visibility.js"></script>
 {% endblock %}
