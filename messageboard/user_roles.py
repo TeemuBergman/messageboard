@@ -51,8 +51,8 @@ def check_secret():
     return False
 
 
-"""
-def unauthorized():
-    flash('You must be logged in to view that page.')
-    return redirect(url_for('auth_bp.login'))
-"""
+# Check if current user can post
+def check_post():
+    if current_user.is_authenticated:
+        return Role[current_user.user_role].value <= Role.BANNED.value
+    return False
