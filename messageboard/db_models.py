@@ -45,6 +45,7 @@ class Threads(db.Model):
     thread_id = db.Column(db.Integer, primary_key = True)
     thread_name = db.Column(db.String(256), nullable = False)
     thread_created = db.Column(db.DateTime, nullable = False)
+    thread_locked = db.Column(db.Boolean, nullable = False, default = False)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.category_id"))
 
 
