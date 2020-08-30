@@ -16,20 +16,40 @@
 
 {% block content %}
 	<div class="ibox-content forum-container">
+		{% if thread_info.thread_locked %}
+			<!-- In case of error -->
+			<div class="alert alert-danger" role="alert">
+				<div class="notification is-danger">
+					This thread is locked!
+				</div>
+			</div>
+		{% endif %}
+		{% if current_user.user_role|string() == "ADMIN" %}
+			<div class="row">
+				<div class="col-md-12">
+					<!-- Admin LOCK THREAD button -->
+					<button type="button" class="btn btn-outline-danger btn-sm"
+							data-toggle="modal" data-target="#admin_lock_thread">
+						{% if not thread_info.thread_locked %}
+							Lock thread
+						{% else %}
+							Unlock thread
+						{% endif %}
+					</button>
+					<!-- Admin DELETE THREAD button -->
+					<button type="button" class="btn btn-outline-danger btn-sm"
+							data-toggle="modal" data-target="#admin_delete_thread">
+						Delete thread
+					</button>
+					<hr/>
+				</div>
+			</div>
+		{% endif %}
 		{% if messages.rowcount %}
 			<!-- Header for threads -->
 			<div class="row">
-				<div class="col-md-9">
+				<div class="col-md-8">
 					<h3 class="text-break">{{ thread_info.thread_name }}</h3>
-				</div>
-				<div class="col-md-3">
-					{% if current_user.user_role|string() == "ADMIN" %}
-						<!-- Admin delete THREAD button -->
-						<button type="button" class="btn btn-danger btn-sm float-right"
-								data-toggle="modal" data-target="#admin_delete_thread">
-							Delete thread (ADMIN)
-						</button>
-					{% endif %}
 				</div>
 			</div>
 			<!-- List all messages -->
@@ -63,14 +83,14 @@
 									<small>(Banned user)</small>
 								{% endif %}
 							</p>
-							{% if row.user_id == current_user.user_id %}
+							{% if row.user_id == current_user.user_id and not thread_info.thread_locked %}
 								<!-- Delete or edit message -->
 								<form method="post">
-									<button type="button" class="btn btn-primary btn-sm"
+									<button type="button" class="btn btn-sm btn-primary"
 											onclick="toggle_visibility({{ row.message_id }})">
 										Edit
 									</button>
-									<button type="button" class="btn btn-danger btn-sm"
+									<button type="button" class="btn btn-sm btn-danger"
 											data-toggle="modal" data-target="#delete_message"
 											onclick="message_id({{ row.message_id }})">
 										Delete
@@ -78,10 +98,10 @@
 								</form>
 							{% elif current_user.user_role|string() == "ADMIN" %}
 								<!-- Admin delete MESSAGE button -->
-								<button type="button" class="btn btn-danger btn-sm"
+								<button type="button" class="btn btn-sm btn-outline-danger"
 										data-toggle="modal" data-target="#admin_delete_message"
 										onclick="message_id({{ row.message_id }})">
-									Delete (ADMIN)
+									Delete
 								</button>
 							{% endif %}
 						</div>
@@ -95,13 +115,17 @@
 									<div class="form-group">
 										<label for="edit_content">Edit message content</label>
 										<textarea class="form-control" id="edit_content" name="edit_content"
-												  rows="5">{{ row.message_content }}</textarea>
+												  rows="5" maxlength="5000"
+												  onchange="count_characters()">{{ row.message_content }}</textarea>
 									</div>
 									<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 									<button type="submit" class="btn btn-primary" name="edit_message"
 											value="{{ row.message_id }}">
-										Submit changes
+										Save changes
 									</button>
+									<div class="col-md-6">
+										<p id="charactersRemaining" class="text-right">0/5000 characters</p>
+									</div>
 								</form>
 							</div>
 						</div>
@@ -118,7 +142,7 @@
 				</div>
 			</div>
 		{% endif %}
-		{% if messages.rowcount and current_user.is_authenticated %}
+		{% if messages.rowcount and current_user.is_authenticated and not thread_info.thread_locked %}
 			<!-- Post a reply to thread -->
 			<form action="/board/{{ category_info.category_id }}/{{ thread_info.thread_id }}/" method="POST">
 				<div class="row">
@@ -173,80 +197,123 @@
 				</div>
 			</div>
 			</div>
-			{% if current_user.user_role|string() == "ADMIN" %}
-				<!-- Admin MESSAGE delete confirmation popup -->
-				<div class="modal fade" id="admin_delete_message" tabindex="-1" role="dialog"
-					 aria-labelledby="admin_delete"
-					 aria-hidden="true" data-backdrop="static">
-					<div class="modal-dialog" role="document">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h5 class="modal-title" id="admin_delete_title">
-									Admin delete message
-								</h5>
-								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-									<span aria-hidden="true">&times;</span>
-								</button>
-							</div>
-							<div class="modal-body">
-								<p>You are deleting another users message, please confirm.</p>
-								<b class="text-danger">THIS OPERATION IS PERMANENT</b>
-							</div>
-							<div class="modal-footer">
-								<form action="/board/{{ category_info.category_id }}/{{ thread_info.thread_id }}/admin_delete_message"
-									  method="post">
-									<input id="message_id_admin" name="message_id" type="hidden">
-									<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-									<button id="delete_message" name="delete_message" type="submit"
-											class="btn btn-danger pull-left">
-										DELETE MESSAGE (ADMIN)
-									</button>
-								</form>
-								<button type="button" class="btn btn-secondary ml-auto" data-dismiss="modal">
-									CANCEL
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
-				<!-- Admin THREAD delete confirmation popup -->
-				<div class="modal fade" id="admin_delete_thread" tabindex="-1" role="dialog"
-					 aria-labelledby="admin_delete"
-					 aria-hidden="true" data-backdrop="static">
-					<div class="modal-dialog" role="document">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h5 class="modal-title" id="admin_delete_title">
-									Admin delete thread
-								</h5>
-								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-									<span aria-hidden="true">&times;</span>
-								</button>
-							</div>
-							<div class="modal-body">
-								<p>You are <b>deleting the whole thread</b>, please confirm.</p>
-								<b class="text-danger">THIS OPERATION IS PERMANENT</b>
-							</div>
-							<div class="modal-footer">
-								<form action="/board/{{ category_info.category_id }}/{{ thread_info.thread_id }}/admin_delete_thread"
-									  method="post">
-									<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-									<button id="delete_message" name="delete_message" type="submit"
-											class="btn btn-danger pull-left">
-										DELETE THREAD (ADMIN)
-									</button>
-								</form>
-								<button type="button" class="btn btn-secondary ml-auto" data-dismiss="modal">
-									CANCEL
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			{% endif %}
-			<!-- Scripts for message functionality -->
-			<script type="text/javascript" src="/static/js/character-counter.js"></script>
-			<script type="text/javascript" src="/static/js/message_id.js"></script>
-			<script type="text/javascript" src="/static/js/toggle_visibility.js"></script>
 		{% endif %}
+
+
+	{% if current_user.user_role|string() == "ADMIN" %}
+		<!-- Admin DELETE MESSAGE confirmation popup -->
+		<div class="modal fade" id="admin_delete_message" tabindex="-1" role="dialog"
+			 aria-labelledby="admin_delete"
+			 aria-hidden="true" data-backdrop="static">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="admin_delete_title">
+							Admin delete message
+						</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p>You are deleting another users message, please confirm.</p>
+						<b class="text-danger">THIS OPERATION IS PERMANENT</b>
+					</div>
+					<div class="modal-footer">
+						<form action="/board/{{ category_info.category_id }}/{{ thread_info.thread_id }}/admin_delete_message"
+							  method="post">
+							<input id="message_id_admin" name="message_id" type="hidden">
+							<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+							<button id="delete_message" name="delete_message" type="submit"
+									class="btn btn-danger pull-left">
+								DELETE MESSAGE
+							</button>
+						</form>
+						<button type="button" class="btn btn-secondary ml-auto" data-dismiss="modal">
+							CANCEL
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Admin LOCK THREAD confirmation popup -->
+		<div class="modal fade" id="admin_lock_thread" tabindex="-1" role="dialog"
+			 aria-labelledby="admin_lock_thread"
+			 aria-hidden="true" data-backdrop="static">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="admin_delete_title">
+							Admin lock/unlock thread
+						</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+
+					<div class="modal-body">
+						<p>You are <b>changing the lock state of this thread</b>, please confirm.</p>
+					</div>
+					<div class="modal-footer">
+						<form action="/board/{{ category_info.category_id }}/{{ thread_info.thread_id }}/admin_lock_thread"
+							  method="post">
+							<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+							<button id="delete_message" name="delete_message" type="submit"
+									class="btn btn-danger pull-left">
+								{% if not thread_info.thread_locked %}
+									LOCK THREAD
+								{% else %}
+									UNLOCK THREAD
+								{% endif %}
+							</button>
+						</form>
+						<button type="button" class="btn btn-secondary ml-auto" data-dismiss="modal">
+							CANCEL
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Admin DELETE THREAD confirmation popup -->
+		<div class="modal fade" id="admin_delete_thread" tabindex="-1" role="dialog"
+			 aria-labelledby="admin_delete"
+			 aria-hidden="true" data-backdrop="static">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="admin_delete_title">
+							Admin delete thread
+						</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p>You are <b>deleting the thread</b>, please confirm.</p>
+						<b class="text-danger">THIS OPERATION IS PERMANENT</b>
+					</div>
+					<div class="modal-footer">
+						<form action="/board/{{ category_info.category_id }}/{{ thread_info.thread_id }}/admin_delete_thread"
+							  method="post">
+							<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+							<button id="delete_message" name="delete_message" type="submit"
+									class="btn btn-danger pull-left">
+								DELETE THREAD
+							</button>
+						</form>
+						<button type="button" class="btn btn-secondary ml-auto" data-dismiss="modal">
+							CANCEL
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+
+	<!-- Scripts for message functionality -->
+	<script type="text/javascript" src="/static/js/character-counter.js"></script>
+	<script type="text/javascript" src="/static/js/message_id.js"></script>
+	<script type="text/javascript" src="/static/js/toggle_visibility.js"></script>
 {% endblock %}
