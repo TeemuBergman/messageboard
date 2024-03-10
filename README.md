@@ -1,3 +1,6 @@
+### Project archived
+This project is one of the many practice assignments for my degree and there will be no more further development. This project contains multiple vulnerabilities, so use it at your own risk!
+
 # MESSAGE BOARD
 "Message board" is a web application that allows registered users to have conversations about different topics.
 
